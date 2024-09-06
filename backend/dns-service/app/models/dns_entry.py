@@ -11,3 +11,11 @@ class DNSEntry(db.Model):
 
     def __repr__(self):
         return f'<DNSEntry {self.domain}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'domain': self.domain,
+            'records': self.records,
+            'last_checked': self.last_checked.isoformat()
+        }

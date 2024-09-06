@@ -1,14 +1,19 @@
+version: '3.8'
+
 services:
-  web:
-    build: .
+  dns-service:
+    build:
+      context: ./backend/dns-service
+      dockerfile: dns-service.dockerfile
     ports:
       - "5000:5000"
-    env_file:
-      - .env
-    depends_on:
-      - db
     environment:
       - DATABASE_URL=postgresql://user:password@db/dns_service
+      - SECRET_KEY=your_secret_key_here
+      - FLASK_ENV=development
+      - DEBUG=True
+    depends_on:
+      - db
 
   db:
     image: postgres:13

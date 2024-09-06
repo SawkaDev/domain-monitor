@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV FLASK_APP=run.py
-ENV FLASK_ENV=production
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=development 
 
-CMD ["gunicorn", "--config", "gunicorn.conf.py", "run:app"]
+CMD ["python", "app.py"]
