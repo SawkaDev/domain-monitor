@@ -1,18 +1,34 @@
 services:
-  dns-service:
-    container_name: dns-service
+
+  domain-service:
+    container_name: domain-service
     build:
-      context: ./backend/dns-service
-      dockerfile: dns-service.dockerfile
+      context: ./backend/domain-service
+      dockerfile: domain-service.dockerfile
     ports:
       - "5000:5000"
     environment:
-      - DATABASE_URL=postgresql://user:password@db/dns_service
+      - DATABASE_URL=postgresql://user:password@db/domain_service
       - SECRET_KEY=your_secret_key_here
       - FLASK_ENV=development
       - DEBUG=True
     depends_on:
       - db
+
+  # dns-service:
+  #   container_name: dns-service
+  #   build:
+  #     context: ./backend/dns-service
+  #     dockerfile: dns-service.dockerfile
+  #   ports:
+  #     - "5001:5000"
+  #   environment:
+  #     - DATABASE_URL=postgresql://user:password@db/dns_service
+  #     - SECRET_KEY=your_secret_key_here
+  #     - FLASK_ENV=development
+  #     - DEBUG=True
+  #   depends_on:
+  #     - db
 
   db:
     container_name: dm-db
