@@ -1,7 +1,6 @@
-version: '3.8'
-
 services:
   dns-service:
+    container_name: dns-service
     build:
       context: ./backend/dns-service
       dockerfile: dns-service.dockerfile
@@ -16,6 +15,7 @@ services:
       - db
 
   db:
+    container_name: dm-db
     image: postgres:13
     volumes:
       - postgres_data:/var/lib/postgresql/data

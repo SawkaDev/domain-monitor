@@ -13,6 +13,10 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
+    with app.app_context():
+        from app.models import dns_entry
+        db.create_all()
+
     from app.api.v1 import bp as api_v1_bp
     app.register_blueprint(api_v1_bp, url_prefix='/api/v1')
 

@@ -27,7 +27,3 @@ def get_dns_entry(domain):
     if entry is None:
         return jsonify({'error': 'Domain not found'}), 404
     return jsonify(entry.to_dict()), 200
-
-@bp.route('/', methods=['GET'])
-def hello():
-    return jsonify({"message": "hello"}), 200
