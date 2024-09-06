@@ -18,3 +18,12 @@ def add_dns_entry():
     except Exception as e:
         current_app.logger.error(f"Error adding domain: {str(e)}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
+
+@bp.route('/domains', methods=['GET'])
+def get_all_domains():
+    try:
+        domains = DomainService.get_all_domains()
+        return jsonify([domain.to_dict() for domain in domains]), 200
+    except Exception as e:
+        current_app.logger.error(f"Error retrieving domains: {str(e)}")
+        return jsonify({'error': 'An unexpected error occurred'}), 500

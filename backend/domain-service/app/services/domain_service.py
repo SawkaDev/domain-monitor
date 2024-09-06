@@ -10,3 +10,7 @@ class DomainService:
         db.session.add(entry)
         db.session.commit()
         return entry
+
+    @staticmethod
+    def get_all_domains():
+        return Domain.query.all()
