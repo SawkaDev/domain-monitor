@@ -5,6 +5,7 @@ services:
     build:
       context: ./backend/domain-service
       dockerfile: domain-service.dockerfile
+    # Remove ones API gateway is implemented
     ports:
       - "5000:5000"
     environment:
@@ -15,20 +16,21 @@ services:
     depends_on:
       - db
 
-  # dns-service:
-  #   container_name: dns-service
-  #   build:
-  #     context: ./backend/dns-service
-  #     dockerfile: dns-service.dockerfile
-  #   ports:
-  #     - "5001:5000"
-  #   environment:
-  #     - DATABASE_URL=postgresql://user:password@db/dns_service
-  #     - SECRET_KEY=your_secret_key_here
-  #     - FLASK_ENV=development
-  #     - DEBUG=True
-  #   depends_on:
-  #     - db
+  dns-service:
+    container_name: dns-service
+    build:
+      context: ./backend/dns-service
+      dockerfile: dns-service.dockerfile
+    # Remove ones API gateway is implemented
+    ports:
+      - "5001:5001"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db/dns_service
+      - SECRET_KEY=your_secret_key_here
+      - FLASK_ENV=development
+      - DEBUG=True
+    depends_on:
+      - db
 
   db:
     container_name: dm-db

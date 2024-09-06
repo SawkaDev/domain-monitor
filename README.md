@@ -1,5 +1,8 @@
 # Domain Monitor
 
+# Access database
+- docker exec -it dm-db psql -U user -d dns_service
+
 ### Planned Features
 - DNS monitoring: A, AAAA, MX, and TXT records
   - Scanning engine (cron)

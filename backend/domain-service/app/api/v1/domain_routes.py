@@ -27,3 +27,7 @@ def get_all_domains():
     except Exception as e:
         current_app.logger.error(f"Error retrieving domains: {str(e)}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
+
+@bp.route('/heartbeat', methods=['GET'])
+def heartbeat():
+    return jsonify({'status': 'ok'}), 200

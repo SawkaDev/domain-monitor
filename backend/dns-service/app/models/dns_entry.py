@@ -4,18 +4,23 @@ from datetime import datetime
 class DNSEntry(db.Model):
     __tablename__ = 'dns_entries'
 
-    id = db.Column(db.Integer, primary_key=True)
-    domain = db.Column(db.String(255), unique=True, nullable=False, index=True)
-    records = db.Column(db.JSON, nullable=False)
-    last_checked = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, index=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    domain_id = db.Column(db.Integer,nullable=False)   
+    record_type = db.Column(db.String(10), nullable=False)
+    value = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
 
-    def __repr__(self):
-        return f'<DNSEntry {self.domain}>'
+    def __init__(self, domain_id, record_type, value, timestamp):
+        self.domain_id = domain_id
+        self.record_type = record_type
+        self.value = value
+        self.timestamp = timestamp
 
     def to_dict(self):
         return {
             'id': self.id,
-            'domain': self.domain,
-            'records': self.records,
-            'last_checked': self.last_checked.isoformat()
+            'domain_id': self.domain_id,
+            'record_type': self.record_type,
+            'value': self.value,
+            'timestamp': self.timestamp
         }
