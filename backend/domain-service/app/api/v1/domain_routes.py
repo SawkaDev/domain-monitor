@@ -2,24 +2,7 @@ from flask import jsonify, request, current_app
 from app.api.v1 import bp
 from app.services.domain_service import DomainService
 from sqlalchemy.exc import IntegrityError
-import pika
-import json
-import os
-
-rabbitmq_host = os.environ.get('RABBITMQ_HOST', 'localhost')
-rabbitmq_queue = 'domain_registration'
-
-def send_message(message):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host))
-    channel = connection.channel()
-    channel.queue_declare(queue=rabbitmq_queue, durable=True)
-    channel.basic_publish(
-        exchange='',
-        routing_key=rabbitmq_queue,
-        body=json.dumps(message),
-        properties=pika.BasicProperties(delivery_mode=2)
-    )
-    connection.close()
+from app.tasks.rabbitmq_producer import send_message
 
 @bp.route('/domain', methods=['POST'])
 def add_dns_entry():
