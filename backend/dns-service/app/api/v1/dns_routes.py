@@ -18,6 +18,13 @@ def get_dns_history(domain_id):
     else:
         return jsonify({"error": "No DNS history found for this domain"}), 404
 
+
+# TODO: helper route for now instead of using the scheduler
+@bp.route('/dns/<domain_name>', methods=['POST'])
+def update_dns_records(domain_name):
+    history = DNSService.update_dns_records(domain_name)
+    return jsonify({"status": history}), history and 200 or 500
+
 @bp.route('/dns/heartbeat', methods=['GET'])
 def heartbeat():
     return jsonify({'status': 'ok'}), 200

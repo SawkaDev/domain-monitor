@@ -4,8 +4,9 @@ from app.extensions import db
 import dns.resolver
 from dns.exception import DNSException
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from sqlalchemy.exc import InvalidRequestError
+from app.models.dns_entry import Domain
 
 from app.models import CurrentDNSRecord, DNSEntryHistory
 
@@ -23,6 +24,8 @@ class DNSService:
                 answers = dns.resolver.resolve(full_domain, record_type)
                 for rdata in answers:
                     value = str(rdata)
+                    # if record_type == 'MX':
+                    #     value = "CHANGED VALUE"
                     records.append({
                         'record_type': record_type,
                         'value': value
@@ -46,9 +49,34 @@ class DNSService:
         return records
 
     @staticmethod
+    def create_or_get_domain(domain_name: str, domain_id: int) -> Tuple[Domain, bool]:
+        session = db.session
+        try:
+            domain = Domain.query.filter_by(id=domain_id, name=domain_name).first()
+            if domain:
+                return domain, False
+            
+            new_domain = Domain(id=domain_id, name=domain_name)
+            session.add(new_domain)
+            session.commit()
+            return new_domain, True
+        except Exception as e:
+            session.rollback()
+            current_app.logger.error(f"Error in create_or_get_domain: {str(e)}")
+            return None, False
+
+    @staticmethod
     def create_initial_dns_records(domain_name: str, domain_id: int) -> bool:
-        if not domain_name:
-            current_app.logger.error("Domain name is empty")
+        if not domain_name or not domain_id:
+            current_app.logger.error("Domain name is empty or domain ID is empty")
+            return False
+
+        domain, is_new = DNSService.create_or_get_domain(domain_name, domain_id)
+        if not domain:
+            current_app.logger.error(f"Failed to create or get domain for {domain_name}")
+            return False
+        if not is_new:
+            current_app.logger.error(f"Inital DNS records already created for {domain_name}")
             return False
 
         current_records = DNSService._get_dns_records(domain_name)
@@ -82,17 +110,20 @@ class DNSService:
             current_app.logger.error("Domain name is empty")
             return False
 
+        domain = Domain.query.filter_by(name=domain_name).first()
+        if not domain:
+            current_app.logger.error(f"Domain {domain_name} not found in database")
+            return False
+
         current_records = DNSService._get_dns_records(domain_name)
         if not current_records:
             current_app.logger.warning(f"No DNS records found for {domain_name}")
             return False
 
-        domain_id = 1  # Hardcoded for now, replace with actual domain_id later
-
         session = db.session
         try:
             # Fetch existing current records
-            existing_records = CurrentDNSRecord.query.filter_by(domain_id=domain_id).all()
+            existing_records = CurrentDNSRecord.query.filter_by(domain_id=domain.id).all()
             
             # Create sets for existing and current records
             existing_set = {(r.record_type, r.value) for r in existing_records}
@@ -104,14 +135,14 @@ class DNSService:
             additions = current_set - existing_set
             for record_type, value in additions:
                 new_record = CurrentDNSRecord(
-                    domain_id=domain_id,
+                    domain_id=domain.id,
                     record_type=record_type,
                     value=value,
                     last_updated=timestamp
                 )
                 session.add(new_record)
                 session.add(DNSEntryHistory(
-                    domain_id=domain_id,
+                    domain_id=domain.id,
                     record_type=record_type,
                     value=value,
                     timestamp=timestamp,
@@ -124,7 +155,7 @@ class DNSService:
                 record_to_delete = next(r for r in existing_records if r.record_type == record_type and r.value == value)
                 session.delete(record_to_delete)
                 session.add(DNSEntryHistory(
-                    domain_id=domain_id,
+                    domain_id=domain.id,
                     record_type=record_type,
                     value=value,
                     timestamp=timestamp,
@@ -141,7 +172,11 @@ class DNSService:
     @staticmethod
     def get_dns_history(domain_id: int) -> List[DNSEntryHistory]:
         try:
-            return DNSEntryHistory.query.filter_by(domain_id=domain_id).order_by(DNSEntryHistory.timestamp.desc()).all()
+            domain = Domain.query.filter_by(id=domain_id).first()
+            if not domain:
+                current_app.logger.error(f"Domain {domain_id} not found in database")
+                return []
+            return DNSEntryHistory.query.filter_by(domain_id=domain.id).order_by(DNSEntryHistory.timestamp.desc()).all()
         except Exception as e:
             current_app.logger.error(f"Error in get_dns_history: {str(e)}")
             return []
@@ -149,7 +184,11 @@ class DNSService:
     @staticmethod
     def get_current_dns_records(domain_id: int) -> List[CurrentDNSRecord]:
         try:
-            return CurrentDNSRecord.query.filter_by(domain_id=domain_id).all()
+            domain = Domain.query.filter_by(id=domain_id).first()
+            if not domain:
+                current_app.logger.error(f"Domain {domain_name} not found in database")
+                return []
+            return CurrentDNSRecord.query.filter_by(domain_id=domain.id).all()
         except Exception as e:
             current_app.logger.error(f"Error in get_current_dns_records: {str(e)}")
             return []
