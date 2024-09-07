@@ -46,7 +46,7 @@ class DNSService:
         return records
 
     @staticmethod
-    def create_initial_dns_records(domain_name: str) -> bool:
+    def create_initial_dns_records(domain_name: str, domain_id: int) -> bool:
         if not domain_name:
             current_app.logger.error("Domain name is empty")
             return False
@@ -55,8 +55,6 @@ class DNSService:
         if not current_records:
             current_app.logger.warning(f"No DNS records found for {domain_name}")
             return False
-
-        domain_id = 1  # Hardcoded for now, replace with actual domain_id later
 
         session = db.session
         try:
@@ -141,18 +139,16 @@ class DNSService:
             return False
 
     @staticmethod
-    def get_dns_history(domain_name: str) -> List[DNSEntryHistory]:
+    def get_dns_history(domain_id: int) -> List[DNSEntryHistory]:
         try:
-            domain_id = 1  # Hardcoded for now, replace with actual domain_id later
             return DNSEntryHistory.query.filter_by(domain_id=domain_id).order_by(DNSEntryHistory.timestamp.desc()).all()
         except Exception as e:
             current_app.logger.error(f"Error in get_dns_history: {str(e)}")
             return []
 
     @staticmethod
-    def get_current_dns_records(domain_name: str) -> List[CurrentDNSRecord]:
+    def get_current_dns_records(domain_id: int) -> List[CurrentDNSRecord]:
         try:
-            domain_id = 1  # Hardcoded for now, replace with actual domain_id later
             return CurrentDNSRecord.query.filter_by(domain_id=domain_id).all()
         except Exception as e:
             current_app.logger.error(f"Error in get_current_dns_records: {str(e)}")

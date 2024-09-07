@@ -2,6 +2,7 @@ from flask import Flask
 from app.extensions import db, migrate
 from app.config import config
 from app.tasks.update_dns_records import init_scheduler
+from app.tasks.rabbitmq_consumer import init_rabbitmq_consumer  # Add this import
 import os
 import logging
 
@@ -27,5 +28,7 @@ def create_app():
 
     from app.utils.error_handlers import register_error_handlers
     register_error_handlers(app)
+
+    init_rabbitmq_consumer(app)
 
     return app
