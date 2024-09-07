@@ -1,9 +1,9 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
-export default function SearchResults() {
+function SearchResultsContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q');
   const [results, setResults] = useState<string[]>([]);
@@ -15,7 +15,7 @@ export default function SearchResults() {
   }, [query]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div>
       <h1 className="text-2xl font-bold mb-4">Search Results</h1>
       {results.length > 0 ? (
         <ul className="space-y-2">
@@ -26,6 +26,16 @@ export default function SearchResults() {
       ) : (
         <p>No results found.</p>
       )}
+    </div>
+  );
+}
+
+export default function SearchResults() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <Suspense fallback={<div>Loading...</div>}>
+        <SearchResultsContent />
+      </Suspense>
     </div>
   );
 }

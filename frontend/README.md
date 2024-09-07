@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DNS Monitoring Service Frontend
+
+This is the frontend application for the DNS Monitoring Service, built with Next.js. It provides a user-friendly interface for users to search, view, and monitor domain information.
+
+## Features
+
+- **Domain Search**: Quickly search for any domain to view its DNS information.
+- **Comprehensive Domain Profile**: View detailed information about a domain, including:
+  - WHOIS data
+  - Current DNS records
+  - DNS history
+  - WHOIS history
+- **Real-time Monitoring**: Set up notifications for changes to specific domains.
+- **User-friendly Interface**: Clean, modern UI with responsive design for all devices.
+- **Fast Performance**: Utilizes Next.js for server-side rendering and optimal performance.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js (v14 or later)
+- npm or yarn
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Follow these steps to set up the project locally:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Clone the repository:
+   git clone https://github.com/SawkaDev/domain-monitor.git
 
-## Learn More
+2. Navigate to the project directory:
+   cd frontend
 
-To learn more about Next.js, take a look at the following resources:
+3. Install dependencies:
+   - Using npm:
+     npm install
+   - Or, if you're using Yarn:
+     yarn install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Start the development server:
+   - Using npm:
+     npm run dev
+   - Or, using Yarn:
+     yarn dev
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. Open [http://localhost:3010](http://localhost:3010) in your browser to see the application.
