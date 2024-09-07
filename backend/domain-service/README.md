@@ -1,11 +1,13 @@
-# DNS Monitoring API
+# Domain Service API
+
+This API provides endpoints for managing domains in the DNS monitoring system. It allows users to add new domains for monitoring, retrieve all monitored domains, and check the service's health.
 
 ## Endpoints
 
 ### POST /domain
 Add a new domain to monitor.
 
-**Parameters:**
+**Request Body:**
 - `domain` (string, required): The domain name to add
 
 **Responses:**
@@ -18,5 +20,11 @@ Add a new domain to monitor.
 Retrieve all monitored domains.
 
 **Responses:**
-- 200: List of all domains
+- 200: List of all monitored domains
 - 500: Server error
+
+### GET /heartbeat
+Check if the service is running.
+
+**Responses:**
+- 200: Service is running
