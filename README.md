@@ -6,6 +6,7 @@ A comprehensive service for tracking and managing DNS records across multiple do
 - [Overview](#overview)
 - [Features](#features)
 - [Architecture](#architecture)
+  - [Technologies Used](#technologies-used)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
@@ -34,6 +35,15 @@ The system is built using a microservices architecture:
 2. DNS Service: Tracks and provides current and historical DNS records
 3. PostgreSQL Database: Stores domain and DNS record data
 4. RabbitMQ: Handles inter-service communication
+
+### Technologies Used
+
+- Python 3.9+
+- Flask: Web framework for building the APIs
+- SQLAlchemy: ORM for database interactions
+- PostgreSQL: Database for storing domain and DNS data
+- RabbitMQ: Message queue for inter-service communication
+- Docker & Docker Compose: Containerization and orchestration
 
 ## Getting Started
 
@@ -81,9 +91,7 @@ See [DNS Service README](./backend/dns-service/README.md) for full API documenta
 - docker exec -it dm-db psql -U user -d dns_service
 
 ## Planned Features
-- DNS monitoring: A, AAAA, MX, and TXT records
-  - Scanning engine (cron)
-  - SSL details
+- SSL Monitoring
 - WHOIS Data Monitoring: 
   - Registrar details
   - Registration and expiration dates
@@ -95,12 +103,6 @@ See [DNS Service README](./backend/dns-service/README.md) for full API documenta
   - add domain
   - dns / whois changes
   - update alerts
-- Message Queue for distributing monitoring tasks rabbit mq
-  - async processing: do not block sender
-  - decouple services
-  - can easily add more consumers
-  - reliable message delivery (persistent queues even if a service fails)
-  - load balancing: distribute traffic across multiple consumers
 - Caching (redis) 
 - Rate limiting
 - Input validation / sanitation
