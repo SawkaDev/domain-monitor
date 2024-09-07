@@ -1,1 +1,1 @@
-from .dns_entry import DNSEntry
+from .dns_entry import CurrentDNSRecord, DNSEntryHistory

@@ -2,82 +2,154 @@ from flask import current_app
 from sqlalchemy.orm import Session
 from app.extensions import db
 import dns.resolver
+from dns.exception import DNSException
 from datetime import datetime
 from typing import List, Optional
 from sqlalchemy.exc import InvalidRequestError
 
-from app.models import DNSEntry
+from app.models import CurrentDNSRecord, DNSEntryHistory
 
 class DNSService:
     @staticmethod
-    def _get_dns_records(domain_name: str) -> Optional[List[DNSEntry]]:
+    def _get_dns_records(domain_name: str) -> Optional[List[dict]]:
         if not domain_name:
             current_app.logger.error("Domain name is empty")
             return None
 
-        try:
-            dns.resolver.resolve(domain_name, 'A')  # Check if domain exists
-        except dns.resolver.NXDOMAIN:
-            current_app.logger.warning(f"Domain {domain_name} does not exist")
-            return None
-
-        timestamp = datetime.now()
         records = []
-        for record_type in ['A', 'AAAA', 'MX', 'TXT', 'NS', 'CNAME', 'SOA', 'PTR', 'SRV', 'CAA']:
-            try:
-                answers = dns.resolver.resolve(domain_name, record_type)
-                for rdata in answers:
-                    dns_entry = DNSEntry(
-                        domain_id=None,  # This will be set later
-                        record_type=record_type,
-                        value=str(rdata),
-                        timestamp=timestamp,
-                        change_type='CURRENT'
-                    )
-                    records.append(dns_entry)
-            except dns.resolver.NoAnswer:
-                current_app.logger.info(f"No {record_type} records found for {domain_name}")
-            except Exception as e:
-                current_app.logger.error(f"Error fetching {record_type} records for {domain_name}: {str(e)}")
+        subdomains = ['', 'www.']  # Check both root domain and www subdomain
+
+        for subdomain in subdomains:
+            full_domain = f"{subdomain}{domain_name}".rstrip('.')
+            for record_type in ['A', 'AAAA', 'MX', 'TXT', 'NS', 'CNAME', 'SOA', 'PTR', 'SRV', 'CAA']:
+                try:
+                    answers = dns.resolver.resolve(full_domain, record_type)
+                    for rdata in answers:
+                        value = str(rdata)
+                        if record_type == 'MX':
+                            value = "MATT"  # Override MX record value
+                        records.append({
+                            'subdomain': subdomain,
+                            'record_type': record_type,
+                            'value': value
+                        })
+                except dns.resolver.NoAnswer:
+                    current_app.logger.info(f"No {record_type} records found for {full_domain}")
+                except dns.resolver.NXDOMAIN:
+                    current_app.logger.warning(f"Domain {full_domain} does not exist")
+                    break  # Stop checking other record types for this subdomain
+                except dns.exception.Timeout:
+                    current_app.logger.error(f"Timeout while fetching {record_type} records for {full_domain}")
+                except DNSException as e:
+                    current_app.logger.error(f"DNS error fetching {record_type} records for {full_domain}: {str(e)}")
+                except Exception as e:
+                    current_app.logger.error(f"Unexpected error fetching {record_type} records for {full_domain}: {str(e)}")
+
+        if not records:
+            current_app.logger.warning(f"No DNS records found for {domain_name} or its www subdomain")
+            return None
 
         return records
 
     @staticmethod
-    def _compare_and_store_changes(domain_id: int, current_records: List[DNSEntry]):
-        try:
-            # Fetch previous records from the database
-            previous_records = DNSEntry.query.filter_by(domain_id=domain_id, change_type='CURRENT').all()
+    def create_initial_dns_records(domain_name: str) -> bool:
+        if not domain_name:
+            current_app.logger.error("Domain name is empty")
+            return False
 
-            changes = []
+        current_records = DNSService._get_dns_records(domain_name)
+        if not current_records:
+            current_app.logger.warning(f"No DNS records found for {domain_name}")
+            return False
+
+        domain_id = 1  # Hardcoded for now, replace with actual domain_id later
+
+        session = db.session
+        try:
             timestamp = datetime.now()
 
-            # Create dictionaries for easier comparison
-            current_dict = {(r.record_type, r.value): r for r in current_records}
-            previous_dict = {(r.record_type, r.value): r for r in previous_records}
+            for record in current_records:
+                new_record = CurrentDNSRecord(
+                    domain_id=domain_id,
+                    record_type=record['record_type'],
+                    value=record['value'],
+                    last_updated=timestamp
+                )
+                session.add(new_record)
+                session.add(DNSEntryHistory(
+                    domain_id=domain_id,
+                    record_type=record['record_type'],
+                    value=record['value'],
+                    timestamp=timestamp,
+                    change_type='INITIAL'
+                ))
 
-            # Find additions and modifications
-            for key, record in current_dict.items():
-                if key not in previous_dict:
-                    changes.append(DNSEntry(
+            session.commit()
+            return True
+        except Exception as e:
+            session.rollback()
+            current_app.logger.error(f"Error in create_initial_dns_records: {str(e)}")
+            return False
+
+    @staticmethod
+    def update_dns_records(domain_name: str) -> bool:
+        if not domain_name:
+            current_app.logger.error("Domain name is empty")
+            return False
+
+        current_records = DNSService._get_dns_records(domain_name)
+        if not current_records:
+            current_app.logger.warning(f"No DNS records found for {domain_name}")
+            return False
+
+        domain_id = 1  # Hardcoded for now, replace with actual domain_id later
+
+        session = db.session
+        try:
+            # Fetch existing current records
+            existing_records = CurrentDNSRecord.query.filter_by(domain_id=domain_id).all()
+            existing_dict = {(r.record_type, r.value): r for r in existing_records}
+
+            timestamp = datetime.now()
+
+            # Update current records and track changes
+            for record in current_records:
+                key = (record['record_type'], record['value'])
+                full_domain = f"{record['subdomain']}{domain_name}".rstrip('.')
+                if key not in existing_dict:
+                    # New record
+                    new_record = CurrentDNSRecord(
                         domain_id=domain_id,
-                        record_type=record.record_type,
-                        value=record.value,
+                        record_type=record['record_type'],
+                        value=record['value'],
+                        last_updated=timestamp
+                    )
+                    session.add(new_record)
+                    session.add(DNSEntryHistory(
+                        domain_id=domain_id,
+                        record_type=record['record_type'],
+                        value=record['value'],
                         timestamp=timestamp,
                         change_type='ADDED'
                     ))
-                elif record.value != previous_dict[key].value:
-                    changes.append(DNSEntry(
+                elif existing_dict[key].value != record['value']:
+                    # Modified record
+                    existing_dict[key].value = record['value']
+                    existing_dict[key].last_updated = timestamp
+                    session.add(DNSEntryHistory(
                         domain_id=domain_id,
-                        record_type=record.record_type,
-                        value=record.value,
+                        record_type=record['record_type'],
+                        value=record['value'],
                         timestamp=timestamp,
                         change_type='MODIFIED'
                     ))
 
-            # Find deletions
-            for key, record in previous_dict.items():
-                if key not in current_dict:
-                    changes.append(DNSEntry(
+            # Check for deleted records
+            current_keys = set((r['record_type'], r['value']) for r in current_records)
+            for key, record in existing_dict.items():
+                if key not in current_keys:
+                    session.delete(record)
+                    session.add(DNSEntryHistory(
                         domain_id=domain_id,
                         record_type=record.record_type,
                         value=record.value,
@@ -85,70 +157,27 @@ class DNSService:
                         change_type='DELETED'
                     ))
 
-            # Store changes
-            if changes:
-                db.session.add_all(changes)
-
-            # Update 'current' records
-            DNSEntry.query.filter_by(domain_id=domain_id, change_type='CURRENT').delete()
-            for record in current_records:
-                record.domain_id = domain_id
-                record.change_type = 'CURRENT'
-            db.session.add_all(current_records)
-
+            session.commit()
+            return True
         except Exception as e:
-            current_app.logger.error(f"Error in _compare_and_store_changes: {str(e)}")
-            raise
-
-    @staticmethod
-    def update_dns_records(domain_name: str) -> bool:
-        try:
-            # domain = Domain.query.filter_by(name=domain_name).first()
-            if not domain_name:
-                current_app.logger.error(f"Domain {domain_name} not found in the database")
-                return False
-
-            current_records = DNSService._get_dns_records(domain_name)
-            if not current_records:
-                current_app.logger.warning(f"No DNS records found for {domain_name}")
-                return False
-
-            db.session.begin()
-            try:
-                # domain.id
-                DNSService._compare_and_store_changes(1, current_records)
-                db.session.commit()
-                return True
-            except Exception as e:
-                db.session.rollback()
-                current_app.logger.error(f"Error in update_dns_records transaction: {str(e)}")
-                return False
-        except Exception as e:
+            session.rollback()
             current_app.logger.error(f"Error in update_dns_records: {str(e)}")
             return False
 
     @staticmethod
-    def get_dns_history(domain_name: str) -> List[DNSEntry]:
+    def get_dns_history(domain_name: str) -> List[DNSEntryHistory]:
         try:
-            domain = Domain.query.filter_by(name=domain_name).first()
-            if not domain:
-                current_app.logger.error(f"Domain {domain_name} not found in the database")
-                return []
-
-            return DNSEntry.query.filter_by(domain_id=domain.id).order_by(DNSEntry.timestamp.desc()).all()
+            domain_id = 1  # Hardcoded for now, replace with actual domain_id later
+            return DNSEntryHistory.query.filter_by(domain_id=domain_id).order_by(DNSEntryHistory.timestamp.desc()).all()
         except Exception as e:
             current_app.logger.error(f"Error in get_dns_history: {str(e)}")
             return []
 
     @staticmethod
-    def get_current_dns_records(domain_name: str) -> List[DNSEntry]:
+    def get_current_dns_records(domain_name: str) -> List[CurrentDNSRecord]:
         try:
-            domain = Domain.query.filter_by(name=domain_name).first()
-            if not domain:
-                current_app.logger.error(f"Domain {domain_name} not found in the database")
-                return []
-
-            return DNSEntry.query.filter_by(domain_id=domain.id, change_type='CURRENT').all()
+            domain_id = 1  # Hardcoded for now, replace with actual domain_id later
+            return CurrentDNSRecord.query.filter_by(domain_id=domain_id).all()
         except Exception as e:
             current_app.logger.error(f"Error in get_current_dns_records: {str(e)}")
             return []
