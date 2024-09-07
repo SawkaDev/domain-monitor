@@ -1,13 +1,13 @@
 import { TableCell } from "@/components/ui/TableCell";
 import { TableHeader } from "@/components/ui/TableHeader";
-import { DomainInfo } from "@/types/domain";
+import { DNSRecord, DomainInfo } from "@/types/domain";
 
 interface OverviewTabSecondaryProps {
-  domainInfo: DomainInfo;
+  dnsRecords: DNSRecord[] | [];
 }
 
 export const OverviewTabSecondary: React.FC<OverviewTabSecondaryProps> = ({
-  domainInfo,
+  dnsRecords,
 }) => {
   return (
     <div>
@@ -17,17 +17,15 @@ export const OverviewTabSecondary: React.FC<OverviewTabSecondaryProps> = ({
           <tr>
             <TableHeader>Type</TableHeader>
             <TableHeader>Name</TableHeader>
-            <TableHeader>Value</TableHeader>
-            <TableHeader>TTL</TableHeader>
+            <TableHeader>Last Updated</TableHeader>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {domainInfo.dnsRecords.map((record, index) => (
+          {dnsRecords.map((record, index) => (
             <tr key={index}>
-              <TableCell>{record.type}</TableCell>
-              <TableCell>{record.name}</TableCell>
+              <TableCell>{record.record_type}</TableCell>
               <TableCell>{record.value}</TableCell>
-              <TableCell>{record.ttl}</TableCell>
+              <TableCell>{new Date(record.last_updated).toLocaleString()}</TableCell>
             </tr>
           ))}
         </tbody>

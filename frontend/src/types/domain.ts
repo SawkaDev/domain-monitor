@@ -1,8 +1,9 @@
 export interface DNSRecord {
-  type: string;
-  name: string;
+  domain_id: number;
+  id: number;
+  last_updated: string;
+  record_type: string;
   value: string;
-  ttl: number;
 }
 
 export interface DNSHistoryEntry {

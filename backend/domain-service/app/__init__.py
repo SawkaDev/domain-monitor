@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from app.extensions import db, migrate
 from app.config import config
 from sqlalchemy_utils import database_exists, create_database
@@ -6,7 +7,10 @@ import os
 
 def create_app():
     app = Flask(__name__)
-    
+
+    # CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+    CORS(app)
+
     config_name = os.environ.get('FLASK_ENV', 'default')
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)

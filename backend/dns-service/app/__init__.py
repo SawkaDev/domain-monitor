@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from app.extensions import db, migrate
 from app.config import config
 from app.tasks.update_dns_records import init_scheduler
@@ -8,6 +9,7 @@ import logging
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
     logging.basicConfig(level=logging.INFO)
     
     config_name = os.environ.get('FLASK_ENV', 'default')

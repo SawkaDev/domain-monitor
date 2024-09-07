@@ -2,7 +2,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { fetchDomainInfo } from "./utils";
+import { fetchCurrentDNS } from "@/utils/domainService";
 import { NotificationPopup } from "@/components/NotificationPopup";
 import { Notification } from "@/components/Notification";
 import { TabButton } from "@/components/ui/TabButton";
@@ -16,7 +18,7 @@ export default function DomainProfile() {
   const params = useParams();
   const domainName = params.domainName as string;
   const [domainInfo, setDomainInfo] = useState<DomainInfo | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [notification, setNotification] = useState<{
@@ -40,11 +42,17 @@ export default function DomainProfile() {
     loadDomainInfo();
   }, [domainName]);
 
+  const { data: currentDNS, isLoading: dnsLoading } = useQuery({
+    queryKey: ["currentDNS", domainName],
+    queryFn: () => fetchCurrentDNS(parseInt(domainName) as number),
+    enabled: !!domainName,
+  });
+
   const handleNotification = (message: string, type: "success" | "error") => {
     setNotification({ message, type });
   };
 
-  if (loading) {
+  if (dnsLoading) {
     return <div className="container mx-auto px-4 py-8">Loading...</div>;
   }
 
@@ -118,7 +126,7 @@ export default function DomainProfile() {
 
       <div className="bg-white shadow rounded-lg p-6">
         {activeTab === "overview" && (
-          <OverviewTabSecondary domainInfo={domainInfo} />
+          <OverviewTabSecondary dnsRecords={currentDNS ? currentDNS : []} />
         )}
         {activeTab === "dnsHistory" && (
           <DNSHistoryTab dnsHistory={domainInfo.dnsHistory} />

@@ -186,7 +186,7 @@ class DNSService:
         try:
             domain = Domain.query.filter_by(id=domain_id).first()
             if not domain:
-                current_app.logger.error(f"Domain {domain_name} not found in database")
+                current_app.logger.error(f"Domain {domain_id} not found in database")
                 return []
             return CurrentDNSRecord.query.filter_by(domain_id=domain.id).all()
         except Exception as e:
