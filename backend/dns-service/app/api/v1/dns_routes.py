@@ -10,12 +10,12 @@ def get_dns_records(domain_name):
     else:
         return jsonify({"error": "Domain not found"}), 404
 
-@bp.route('/dns/<string:domain_name>', methods=['POST'])
+@bp.route('/dns/<domain_name>', methods=['POST'])
 def update_dns_records(domain_name):
     if DNSService.update_dns_records(domain_name):
-        return jsonify({"message": "DNS records updated successfully"}), 200
+        return jsonify({"message": f"DNS records for {domain_name} updated successfully"}), 200
     else:
-        return jsonify({"error": "Failed to update DNS records"}), 400
+        return jsonify({"error": f"Failed to update DNS records for {domain_name}"}), 500
 
 @bp.route('/dns/heartbeat', methods=['GET'])
 def heartbeat():
