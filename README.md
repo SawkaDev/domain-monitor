@@ -76,19 +76,10 @@ Key variables:
 
 ## API Documentation
 
-For detailed API documentation of each service, please refer to their respective README files:
+For detailed API documentation, please refer to the following README files:
 
-### Domain Service API
-
-See [Domain Service README](./backend/domain-service/README.md) for full API documentation.
-
-### DNS Service API
-
-See [DNS Service README](./backend/dns-service/README.md) for full API documentation.
-
-
-## Access Database
-- docker exec -it dm-db psql -U user -d dns_service
+- [Domain Service README](./backend/domain-service/README.md)
+- [DNS Service README](./backend/dns-service/README.md)
 
 ## Planned Features
 - SSL Monitoring
