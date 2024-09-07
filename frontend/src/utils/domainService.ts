@@ -30,12 +30,12 @@ export const fetchDomains = async (): Promise<Domain[]> => {
 };
 
 
-export const fetchCurrentDNS = async (domainId: number): Promise<DNSRecord[] | []> => {
+export const fetchCurrentDNS = async (domain: string): Promise<DNSRecord[] | []> => {
   try {
-    const response = await dnsApi.get<DNSRecord[]>(`/dns/${domainId}`);
+    const response = await dnsApi.get<DNSRecord[]>(`/dns/${domain}`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching current DNS for domain ID ${domainId}:`, error);
-    throw new Error(`Failed to fetch current DNS for domain ID ${domainId}`);
+    console.error(`Error fetching current DNS for domain ${domain}:`, error);
+    throw new Error(`Failed to fetch current DNS for domain ${domain}`);
   }
 };

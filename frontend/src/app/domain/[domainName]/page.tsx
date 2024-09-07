@@ -13,6 +13,7 @@ import { OverviewTabMain } from "./components/OverviewTabMain";
 import { OverviewTabSecondary } from "./components/OverviewTabSecondary";
 import { DNSHistoryTab } from "./components/DNSHistoryTab";
 import { WhoIsHistoryTab } from "./components/WhoIsHistoryTab";
+import { Loading } from "@/components/ui/Loading";
 
 export default function DomainProfile() {
   const params = useParams();
@@ -44,7 +45,7 @@ export default function DomainProfile() {
 
   const { data: currentDNS, isLoading: dnsLoading } = useQuery({
     queryKey: ["currentDNS", domainName],
-    queryFn: () => fetchCurrentDNS(parseInt(domainName) as number),
+    queryFn: () => fetchCurrentDNS(domainName),
     enabled: !!domainName,
   });
 
@@ -53,7 +54,7 @@ export default function DomainProfile() {
   };
 
   if (dnsLoading) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>;
+    return <Loading />;
   }
 
   if (!domainInfo) {

@@ -2,9 +2,9 @@ from flask import jsonify, request
 from app.api.v1 import bp
 from app.services.dns_service import DNSService
 
-@bp.route('/dns/<int:domain_id>', methods=['GET'])
-def get_dns_records(domain_id):
-    records = DNSService.get_current_dns_records(domain_id)
+@bp.route('/dns/<string:domain>', methods=['GET'])
+def get_dns_records(domain):
+    records = DNSService.get_current_dns_records(domain)
     if records:
         return jsonify([record.to_dict() for record in records]), 200
     else:

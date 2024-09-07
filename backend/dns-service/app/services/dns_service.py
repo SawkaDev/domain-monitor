@@ -182,11 +182,11 @@ class DNSService:
             return []
 
     @staticmethod
-    def get_current_dns_records(domain_id: int) -> List[CurrentDNSRecord]:
+    def get_current_dns_records(domain: str) -> List[CurrentDNSRecord]:
         try:
-            domain = Domain.query.filter_by(id=domain_id).first()
+            domain = Domain.query.filter_by(name=domain).first()
             if not domain:
-                current_app.logger.error(f"Domain {domain_id} not found in database")
+                current_app.logger.error(f"Domain {domain} not found in database")
                 return []
             return CurrentDNSRecord.query.filter_by(domain_id=domain.id).all()
         except Exception as e:

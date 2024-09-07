@@ -46,7 +46,7 @@ export default function Home() {
             >
               <h2 className="text-xl font-semibold mb-2 text-text-primary">
                 <Link
-                  href={`/domain/${item.id}`}
+                  href={`/domain/${item.name}`}
                   className="text-text-secondary hover:text-text-primary transition-colors"
                 >
                   {item.name}
