@@ -23,8 +23,6 @@ class DNSService:
                 answers = dns.resolver.resolve(full_domain, record_type)
                 for rdata in answers:
                     value = str(rdata)
-                    if record_type == 'NS':
-                        value = "matt.com"  # Override MX record value for testing
                     records.append({
                         'record_type': record_type,
                         'value': value
@@ -98,89 +96,42 @@ class DNSService:
             # Fetch existing current records
             existing_records = CurrentDNSRecord.query.filter_by(domain_id=domain_id).all()
             
-            # Group existing records by record type
-            existing_dict = {}
-            for record in existing_records:
-                if record.record_type not in existing_dict:
-                    existing_dict[record.record_type] = []
-                existing_dict[record.record_type].append(record)
+            # Create sets for existing and current records
+            existing_set = {(r.record_type, r.value) for r in existing_records}
+            current_set = {(r['record_type'], r['value']) for r in current_records}
 
             timestamp = datetime.now()
 
-            # Group current records by record type
-            current_dict = {}
-            for record in current_records:
-                if record['record_type'] not in current_dict:
-                    current_dict[record['record_type']] = []
-                current_dict[record['record_type']].append(record['value'])
+            # Find additions
+            additions = current_set - existing_set
+            for record_type, value in additions:
+                new_record = CurrentDNSRecord(
+                    domain_id=domain_id,
+                    record_type=record_type,
+                    value=value,
+                    last_updated=timestamp
+                )
+                session.add(new_record)
+                session.add(DNSEntryHistory(
+                    domain_id=domain_id,
+                    record_type=record_type,
+                    value=value,
+                    timestamp=timestamp,
+                    change_type='ADDED'
+                ))
 
-            # Compare and update records
-            for record_type, current_values in current_dict.items():
-                if record_type in existing_dict:
-                    existing_values = [r.value for r in existing_dict[record_type]]
-                    
-                    # Check for modifications and additions
-                    for value in current_values:
-                        if value in existing_values:
-                            existing_values.remove(value)
-                        else:
-                            # New value for existing record type
-                            new_record = CurrentDNSRecord(
-                                domain_id=domain_id,
-                                record_type=record_type,
-                                value=value,
-                                last_updated=timestamp
-                            )
-                            session.add(new_record)
-                            session.add(DNSEntryHistory(
-                                domain_id=domain_id,
-                                record_type=record_type,
-                                value=value,
-                                timestamp=timestamp,
-                                change_type='ADDED'
-                            ))
-                    
-                    # Remaining values in existing_values have been removed
-                    for value in existing_values:
-                        record_to_delete = next(r for r in existing_dict[record_type] if r.value == value)
-                        session.delete(record_to_delete)
-                        session.add(DNSEntryHistory(
-                            domain_id=domain_id,
-                            record_type=record_type,
-                            value=value,
-                            timestamp=timestamp,
-                            change_type='DELETED'
-                        ))
-                else:
-                    # Entirely new record type
-                    for value in current_values:
-                        new_record = CurrentDNSRecord(
-                            domain_id=domain_id,
-                            record_type=record_type,
-                            value=value,
-                            last_updated=timestamp
-                        )
-                        session.add(new_record)
-                        session.add(DNSEntryHistory(
-                            domain_id=domain_id,
-                            record_type=record_type,
-                            value=value,
-                            timestamp=timestamp,
-                            change_type='ADDED'
-                        ))
-
-            # Check for deleted record types
-            for record_type in existing_dict.keys():
-                if record_type not in current_dict:
-                    for record in existing_dict[record_type]:
-                        session.delete(record)
-                        session.add(DNSEntryHistory(
-                            domain_id=domain_id,
-                            record_type=record.record_type,
-                            value=record.value,
-                            timestamp=timestamp,
-                            change_type='DELETED'
-                        ))
+            # Find deletions
+            deletions = existing_set - current_set
+            for record_type, value in deletions:
+                record_to_delete = next(r for r in existing_records if r.record_type == record_type and r.value == value)
+                session.delete(record_to_delete)
+                session.add(DNSEntryHistory(
+                    domain_id=domain_id,
+                    record_type=record_type,
+                    value=value,
+                    timestamp=timestamp,
+                    change_type='DELETED'
+                ))
 
             session.commit()
             return True
