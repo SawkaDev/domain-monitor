@@ -12,11 +12,22 @@ const fetchWhoIs = async (domain: string) => {
     const response = await api.get(`/whois/${domain}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching domains:", error);
-    throw new Error("Failed to fetch domains");
+    console.error("Error fetching Whois:", error);
+    throw new Error("Failed to fetch Whois");
+  }
+};
+
+const fetchWhoIsHistory = async (domain: string) => {
+  try {
+    const response = await api.get(`/whois/history/${domain}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching history:", error);
+    throw new Error("Failed to fetch history");
   }
 };
 
 export const WhoIsService = {
   fetchWhoIs,
+  fetchWhoIsHistory,
 };

@@ -1,13 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDomainInfo } from "./utils";
 import { NotificationPopup } from "@/components/NotificationPopup";
 import { Notification } from "@/components/Notification";
 import { TabButton } from "@/components/ui/TabButton";
-import { DomainInfo } from "@/types/domain";
 import { OverviewTabMain } from "./components/OverviewTabMain";
 import { OverviewTabSecondary } from "./components/OverviewTabSecondary";
 import { DNSHistoryTab } from "./components/DNSHistoryTab";
@@ -19,30 +17,12 @@ import { WhoIsService } from "@/utils/whoisService";
 export default function DomainProfile() {
   const params = useParams();
   const domainName = params.domainName as string;
-  const [domainInfo, setDomainInfo] = useState<DomainInfo | null>(null);
-  const [, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [notification, setNotification] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
-
-  useEffect(() => {
-    const loadDomainInfo = async () => {
-      setLoading(true);
-      try {
-        const info = await fetchDomainInfo(domainName);
-        setDomainInfo(info);
-      } catch (error) {
-        console.error("Failed to fetch domain info:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadDomainInfo();
-  }, [domainName]);
 
   const { data: currentDNS, isLoading: dnsLoading } = useQuery({
     queryKey: ["currentDNS", domainName],
@@ -66,7 +46,7 @@ export default function DomainProfile() {
     return <Loading />;
   }
 
-  if (!domainInfo) {
+  if (!domainName) {
     return (
       <div className="container mx-auto px-4 py-8">
         No information found for this domain.
@@ -133,7 +113,6 @@ export default function DomainProfile() {
 
       {activeTab === "overview" && (
         <OverviewTabMain
-          domainInfo={domainInfo}
           currentDNSrecords={currentDNS ? currentDNS.length : 0}
           whoIsInfo={currentWhois ? currentWhois : {}}
         />
@@ -147,7 +126,7 @@ export default function DomainProfile() {
           <DNSHistoryTab domainName={domainName} />
         )}
         {activeTab === "whoisHistory" && (
-          <WhoIsHistoryTab whoisHistory={domainInfo.whoisHistory} />
+          <WhoIsHistoryTab domainName={domainName} />
         )}
       </div>
     </div>

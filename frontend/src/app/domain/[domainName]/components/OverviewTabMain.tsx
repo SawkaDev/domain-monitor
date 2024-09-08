@@ -1,14 +1,12 @@
-import { DomainInfo, WHOISInfo } from "@/types/domain";
+import { WHOISInfo } from "@/types/domain";
 import { formatDate } from "@/utils/utils";
 
 interface OverviewTabMainProps {
-  domainInfo: DomainInfo;
   currentDNSrecords: number;
   whoIsInfo: WHOISInfo;
 }
 
 export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
-  domainInfo,
   whoIsInfo,
   currentDNSrecords,
 }) => {
@@ -54,11 +52,11 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
         <div className="space-y-3">
           <p>
             <span className="font-semibold">Monitored Since: </span>
-            {formatDate(domainInfo.monitoredSince)}
+            TBD
           </p>
           <p>
             <span className="font-semibold">Last Monitored: </span>
-            {new Date(domainInfo.lastMonitored).toLocaleString()}
+            TBD
           </p>
           <p>
             <span className="font-semibold">Current DNS Records: </span>
@@ -66,11 +64,11 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
           </p>
           <p>
             <span className="font-semibold">DNS Changes: </span>
-            {domainInfo.dnsHistory.length}
+            TBD
           </p>
           <p>
             <span className="font-semibold">WHOIS Changes: </span>
-            {domainInfo.whoisHistory.length}
+            TBD
           </p>
         </div>
       </div>

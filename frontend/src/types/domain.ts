@@ -39,17 +39,10 @@ export interface WHOISInfo {
 }
 
 export interface WHOISHistoryEntry {
-  date: string;
-  registrar: string;
-  expirationDate: string;
-  nameServers: string[];
-}
-
-export interface DomainInfo {
-  dnsRecords: DNSRecord[];
-  dnsHistory: DNSHistoryEntry[];
-  whoisInfo: WHOISInfo;
-  whoisHistory: WHOISHistoryEntry[];
-  monitoredSince: string;
-  lastMonitored: string;
+  id: number;
+  domain_id: number;
+  field_name: string;
+  old_value: string;
+  new_value: string;
+  changed_at: string;
 }
