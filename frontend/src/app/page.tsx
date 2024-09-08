@@ -1,6 +1,6 @@
 "use client";
 import { Loading } from "@/components/ui/Loading";
-import { fetchDomains } from "@/utils/domainService";
+import { DomainService } from "@/utils/domainService";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
@@ -11,7 +11,7 @@ export default function Home() {
     error,
   } = useQuery({
     queryKey: ["domains"],
-    queryFn: fetchDomains,
+    queryFn: DomainService.fetchDomains,
   });
 
   if (isLoading) {

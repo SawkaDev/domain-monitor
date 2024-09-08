@@ -3,8 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { TableCell } from "@/components/ui/TableCell";
 import { TableHeader } from "@/components/ui/TableHeader";
 import { DNSHistoryEntry } from "@/types/domain";
-import { formatDate } from "@/utils/utils";
-import { getDNSHistory } from "@/utils/domainService";
+import { DNSService } from "@/utils/dnsService";
 
 interface DNSHistoryTabProps {
   domainName: string;
@@ -17,7 +16,7 @@ export const DNSHistoryTab: React.FC<DNSHistoryTabProps> = ({ domainName }) => {
     error,
   } = useQuery<DNSHistoryEntry[]>({
     queryKey: ["dnsHistory", domainName],
-    queryFn: () => getDNSHistory(domainName),
+    queryFn: () => DNSService.getDNSHistory(domainName),
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,
   });

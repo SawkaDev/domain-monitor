@@ -2,10 +2,6 @@ import { DomainInfo } from "@/types/domain";
 
 export async function fetchDomainInfo(domainName: string): Promise<DomainInfo> {
   return {
-    dnsRecords: [
-      { type: "A", name: domainName, value: "192.0.2.1", ttl: 3600 },
-      { type: "MX", name: domainName, value: "mail.example.com", ttl: 3600 },
-    ],
     dnsHistory: [
       {
         date: "2023-09-01",
@@ -20,12 +16,6 @@ export async function fetchDomainInfo(domainName: string): Promise<DomainInfo> {
         newValue: "mail.example.com",
       },
     ],
-    whoisInfo: {
-      registrar: "Example Registrar, Inc.",
-      creationDate: "2020-01-01",
-      expirationDate: "2025-01-01",
-      nameServers: ["ns1.example.com", "ns2.example.com"],
-    },
     whoisHistory: [
       {
         date: "2022-01-01",

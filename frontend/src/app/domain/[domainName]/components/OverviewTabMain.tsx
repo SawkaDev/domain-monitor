@@ -1,18 +1,23 @@
-import { DomainInfo } from "@/types/domain";
+import { DomainInfo, WHOISInfo } from "@/types/domain";
 import { formatDate } from "@/utils/utils";
 
 interface OverviewTabMainProps {
   domainInfo: DomainInfo;
   currentDNSrecords: number;
+  whoIsInfo: WHOISInfo;
 }
 
 export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
   domainInfo,
+  whoIsInfo,
   currentDNSrecords,
 }) => {
   const daysUntilExpiration = () => {
     const today = new Date();
-    const expirationDate = new Date(domainInfo.whoisInfo.expirationDate);
+    if (whoIsInfo.expiration_date === null) {
+      return "n/a";
+    }
+    const expirationDate = new Date(whoIsInfo.expiration_date);
     const diffTime = Math.abs(expirationDate.getTime() - today.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
@@ -24,15 +29,15 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
         <div className="space-y-3">
           <p>
             <span className="font-semibold">Registrar: </span>
-            {domainInfo.whoisInfo.registrar}
+            {whoIsInfo.registrar}
           </p>
           <p>
             <span className="font-semibold">Creation Date: </span>
-            {formatDate(domainInfo.whoisInfo.creationDate)}
+            {formatDate(whoIsInfo.registration_date)}
           </p>
           <p>
             <span className="font-semibold">Expiration Date: </span>
-            {formatDate(domainInfo.whoisInfo.expirationDate)}
+            {formatDate(whoIsInfo.expiration_date)}
           </p>
           <p>
             <span className="font-semibold">Days Until Expiration: </span>
@@ -40,7 +45,7 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
           </p>
           <p>
             <span className="font-semibold">Name Servers: </span>
-            {domainInfo.whoisInfo.nameServers.join(", ")}
+            {whoIsInfo.nameservers}
           </p>
         </div>
       </div>

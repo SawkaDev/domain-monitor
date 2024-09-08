@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDomainInfo } from "./utils";
-import { fetchCurrentDNS } from "@/utils/domainService";
 import { NotificationPopup } from "@/components/NotificationPopup";
 import { Notification } from "@/components/Notification";
 import { TabButton } from "@/components/ui/TabButton";
@@ -14,6 +13,8 @@ import { OverviewTabSecondary } from "./components/OverviewTabSecondary";
 import { DNSHistoryTab } from "./components/DNSHistoryTab";
 import { WhoIsHistoryTab } from "./components/WhoIsHistoryTab";
 import { Loading } from "@/components/ui/Loading";
+import { DNSService } from "@/utils/dnsService";
+import { WhoIsService } from "@/utils/whoisService";
 
 export default function DomainProfile() {
   const params = useParams();
@@ -45,7 +46,14 @@ export default function DomainProfile() {
 
   const { data: currentDNS, isLoading: dnsLoading } = useQuery({
     queryKey: ["currentDNS", domainName],
-    queryFn: () => fetchCurrentDNS(domainName),
+    queryFn: () => DNSService.fetchCurrentDNS(domainName),
+    enabled: !!domainName,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: currentWhois, isLoading: whoisloading } = useQuery({
+    queryKey: ["whoisData", domainName],
+    queryFn: () => WhoIsService.fetchWhoIs(domainName),
     enabled: !!domainName,
     staleTime: 1000 * 60 * 5,
   });
@@ -102,7 +110,6 @@ export default function DomainProfile() {
           onClose={() => setNotification(null)}
         />
       )}
-
       <div className="mb-6 flex space-x-2">
         <TabButton
           active={activeTab === "overview"}
@@ -128,6 +135,7 @@ export default function DomainProfile() {
         <OverviewTabMain
           domainInfo={domainInfo}
           currentDNSrecords={currentDNS ? currentDNS.length : 0}
+          whoIsInfo={currentWhois ? currentWhois : {}}
         />
       )}
 
