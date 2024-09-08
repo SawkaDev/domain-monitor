@@ -4,7 +4,7 @@ from datetime import datetime
 class Domain(db.Model):
     __tablename__ = 'domains'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(255), unique=True, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -20,15 +20,20 @@ def callback(ch, method, properties, body):
 
 def start_consuming(app):
     rabbitmq_host = os.environ.get('RABBITMQ_HOST', 'localhost')
-    rabbitmq_queue = 'domain_registration'
+    rabbitmq_exchange = 'domain_events'
 
     with app.app_context():
         connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host))
         channel = connection.channel()
-        channel.queue_declare(queue=rabbitmq_queue, durable=True)
+
+        channel.exchange_declare(exchange=rabbitmq_exchange, exchange_type='fanout', durable=True)
+        result = channel.queue_declare(queue='', exclusive=True)
+        queue_name = result.method.queue
+        channel.queue_bind(exchange=rabbitmq_exchange, queue=queue_name)
         channel.basic_qos(prefetch_count=1)
-        channel.basic_consume(queue=rabbitmq_queue, on_message_callback=callback)
+        channel.basic_consume(queue=queue_name, on_message_callback=callback)
         app.logger.info('DNS service waiting for messages...')
+        
         channel.start_consuming()
 
 def init_rabbitmq_consumer(app):
