@@ -37,18 +37,14 @@ class WhoisService:
 
             whois_dict = {
                 'dnssec': result.get('dnssec', False),
-                'registrant': {
-                    'address': {
-                        'country': registrant.get('address', {}).get('country'),
-                        'locality': registrant.get('address', {}).get('locality'),
-                        'postal_code': registrant.get('address', {}).get('postal_code'),
-                        'region': registrant.get('address', {}).get('region'),
-                        'street_address': registrant.get('address', {}).get('street_address')
-                    },
-                    'email': registrant.get('email'),
-                    'name': registrant.get('name'),
-                    'tel': registrant.get('tel')
-                },
+                'registrant_country': registrant.get('address', {}).get('country'),
+                'registrant_locality': registrant.get('address', {}).get('locality'),
+                'registrant_postal_code': registrant.get('address', {}).get('postal_code'),
+                'registrant_region': registrant.get('address', {}).get('region'),
+                'registrant_street_address': registrant.get('address', {}).get('street_address'),
+                'registrant_email': registrant.get('email'),
+                'registrant_name': registrant.get('name'),
+                'registrant_tel': registrant.get('tel'),
                 'registrar': registrar.get('name'),
                 'expiration_date': result.get('expiration_date'),
                 'last_changed_date': result.get('last_changed_date'),
@@ -59,6 +55,7 @@ class WhoisService:
                 'terms_of_service_url': result.get('terms_of_service_url'),
                 'type': result.get('type')
             }
+
             return whois_dict
         except Exception as e:
             current_app.logger.error(f"Error fetching WHOIS data for {domain_name}: {str(e)}")
@@ -104,15 +101,7 @@ class WhoisService:
         try:
             new_record = CurrentWhois(
                 domain_id=domain_id,
-                registrar=whois_data['registrar'],
-                creation_date=whois_data['expiration_date'],
-                expiration_date=whois_data['expiration_date'],
-                last_updated_date=whois_data['last_updated'],
-                name_servers=','.join(whois_data['name_servers']) if whois_data['name_servers'] else None,
-                registrant=str(whois_data['registrant']),
-                admin=str(whois_data['admin']),
-                tech=str(whois_data['tech']),
-                billing=str(whois_data['billing'])
+                **whois_data
             )
             session.add(new_record)
             session.commit()
