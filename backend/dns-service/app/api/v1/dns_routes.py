@@ -8,15 +8,15 @@ def get_dns_records(domain):
     if records:
         return jsonify([record.to_dict() for record in records]), 200
     else:
-        return jsonify({"error": "No DNS records found for this domain"}), 404
+        return jsonify([]), 200
 
-@bp.route('/dns/history/<domain_id>', methods=['GET'])
-def get_dns_history(domain_id):
-    history = DNSService.get_dns_history(domain_id)
+@bp.route('/dns/history/<string:domain>', methods=['GET'])
+def get_dns_history(domain):
+    history = DNSService.get_dns_history(domain)
     if history:
         return jsonify([entry.to_dict() for entry in history]), 200
     else:
-        return jsonify({"error": "No DNS history found for this domain"}), 404
+        return jsonify([]), 200
 
 
 # TODO: helper route for now instead of using the scheduler

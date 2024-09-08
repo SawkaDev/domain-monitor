@@ -1,36 +1,62 @@
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { TableCell } from "@/components/ui/TableCell";
 import { TableHeader } from "@/components/ui/TableHeader";
 import { DNSHistoryEntry } from "@/types/domain";
 import { formatDate } from "@/utils/utils";
+import { getDNSHistory } from "@/utils/domainService";
 
 interface DNSHistoryTabProps {
-  dnsHistory: DNSHistoryEntry[];
+  domainName: string;
 }
 
-export const DNSHistoryTab: React.FC<DNSHistoryTabProps> = ({ dnsHistory }) => {
+export const DNSHistoryTab: React.FC<DNSHistoryTabProps> = ({ domainName }) => {
+  const {
+    data: dnsHistory,
+    isLoading,
+    error,
+  } = useQuery<DNSHistoryEntry[]>({
+    queryKey: ["dnsHistory", domainName],
+    queryFn: () => getDNSHistory(domainName),
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  if (isLoading) return <div>Loading DNS history...</div>;
+  // if (error)
+  //   return <div>Error loading DNS history: {(error as Error).message}</div>;
+
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">DNS History</h2>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <TableHeader>Date</TableHeader>
-            <TableHeader>Change Type</TableHeader>
-            <TableHeader>Old Value</TableHeader>
-            <TableHeader>New Value</TableHeader>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {dnsHistory.map((entry, index) => (
-            <tr key={index}>
-              <TableCell>{formatDate(entry.date)}</TableCell>
-              <TableCell>{entry.changeType}</TableCell>
-              <TableCell>{entry.oldValue}</TableCell>
-              <TableCell>{entry.newValue}</TableCell>
+      <h2 className="text-xl font-semibold mb-4">
+        DNS History for {domainName}
+      </h2>
+      {!error && dnsHistory && dnsHistory.length > 0 ? (
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <TableHeader>Date</TableHeader>
+              <TableHeader>Record Type</TableHeader>
+              <TableHeader>Action</TableHeader>
+              <TableHeader>Value</TableHeader>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {dnsHistory.map((entry, index) => (
+              <tr key={index}>
+                <TableCell>
+                  {new Date(entry.timestamp).toLocaleString()}
+                </TableCell>
+                <TableCell>{entry.record_type}</TableCell>
+                <TableCell>{entry.change_type}</TableCell>
+                <TableCell>{entry.value}</TableCell>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p>No DNS history found since monitoring started. </p>
+      )}
     </div>
   );
 };

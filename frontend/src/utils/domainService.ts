@@ -39,3 +39,15 @@ export const fetchCurrentDNS = async (domain: string): Promise<DNSRecord[] | []>
     throw new Error(`Failed to fetch current DNS for domain ${domain}`);
   }
 };
+
+
+export const getDNSHistory = async (domain: string) => {
+  try {
+    const response = await dnsApi.get(`/dns/history/${domain}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching DNS history for domain ${domain}:`, error);
+    throw new Error(`Failed to fetch DNS history for domain ${domain}`);
+  }
+}
+

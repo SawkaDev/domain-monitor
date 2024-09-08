@@ -47,6 +47,7 @@ export default function DomainProfile() {
     queryKey: ["currentDNS", domainName],
     queryFn: () => fetchCurrentDNS(domainName),
     enabled: !!domainName,
+    staleTime: 1000 * 60 * 5,
   });
 
   const handleNotification = (message: string, type: "success" | "error") => {
@@ -123,14 +124,19 @@ export default function DomainProfile() {
         </TabButton>
       </div>
 
-      {activeTab === "overview" && <OverviewTabMain domainInfo={domainInfo} />}
+      {activeTab === "overview" && (
+        <OverviewTabMain
+          domainInfo={domainInfo}
+          currentDNSrecords={currentDNS ? currentDNS.length : 0}
+        />
+      )}
 
       <div className="bg-white shadow rounded-lg p-6">
         {activeTab === "overview" && (
           <OverviewTabSecondary dnsRecords={currentDNS ? currentDNS : []} />
         )}
         {activeTab === "dnsHistory" && (
-          <DNSHistoryTab dnsHistory={domainInfo.dnsHistory} />
+          <DNSHistoryTab domainName={domainName} />
         )}
         {activeTab === "whoisHistory" && (
           <WhoIsHistoryTab whoisHistory={domainInfo.whoisHistory} />

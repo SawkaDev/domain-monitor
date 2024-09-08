@@ -3,10 +3,12 @@ import { formatDate } from "@/utils/utils";
 
 interface OverviewTabMainProps {
   domainInfo: DomainInfo;
+  currentDNSrecords: number;
 }
 
 export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
   domainInfo,
+  currentDNSrecords,
 }) => {
   const daysUntilExpiration = () => {
     const today = new Date();
@@ -55,7 +57,7 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
           </p>
           <p>
             <span className="font-semibold">Current DNS Records: </span>
-            {domainInfo.dnsRecords.length}
+            {currentDNSrecords ? currentDNSrecords : 0}
           </p>
           <p>
             <span className="font-semibold">DNS Changes: </span>

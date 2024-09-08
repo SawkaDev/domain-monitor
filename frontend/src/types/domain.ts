@@ -7,10 +7,11 @@ export interface DNSRecord {
 }
 
 export interface DNSHistoryEntry {
-  date: string;
-  changeType: string;
-  oldValue: string;
-  newValue: string;
+  timestamp: string;
+  value: string;
+  change_type: string;
+  domain_id: string;
+  record_type: string;
 }
 
 export interface WHOISInfo {

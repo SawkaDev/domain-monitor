@@ -170,11 +170,11 @@ class DNSService:
             return False
 
     @staticmethod
-    def get_dns_history(domain_id: int) -> List[DNSEntryHistory]:
+    def get_dns_history(domain: str) -> List[DNSEntryHistory]:
         try:
-            domain = Domain.query.filter_by(id=domain_id).first()
+            domain = Domain.query.filter_by(name=domain).first()
             if not domain:
-                current_app.logger.error(f"Domain {domain_id} not found in database")
+                current_app.logger.error(f"Domain {domain} not found in database")
                 return []
             return DNSEntryHistory.query.filter_by(domain_id=domain.id).order_by(DNSEntryHistory.timestamp.desc()).all()
         except Exception as e:
