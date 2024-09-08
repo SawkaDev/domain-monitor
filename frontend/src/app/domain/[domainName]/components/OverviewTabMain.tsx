@@ -1,14 +1,16 @@
-import { WHOISInfo } from "@/types/domain";
+import { DomainStats, WHOISInfo } from "@/types/domain";
 import { formatDate } from "@/utils/utils";
 
 interface OverviewTabMainProps {
   currentDNSrecords: number;
   whoIsInfo: WHOISInfo;
+  stats: DomainStats;
 }
 
 export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
   whoIsInfo,
   currentDNSrecords,
+  stats,
 }) => {
   const daysUntilExpiration = () => {
     const today = new Date();
@@ -52,23 +54,23 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
         <div className="space-y-3">
           <p>
             <span className="font-semibold">Monitored Since: </span>
-            TBD
+            {formatDate(stats.created_at)}
           </p>
           <p>
             <span className="font-semibold">Last Monitored: </span>
-            TBD
+            {new Date(stats.updated_at).toLocaleString()}
           </p>
           <p>
             <span className="font-semibold">Current DNS Records: </span>
-            {currentDNSrecords ? currentDNSrecords : 0}
+            {currentDNSrecords}
           </p>
           <p>
             <span className="font-semibold">DNS Changes: </span>
-            TBD
+            {stats.dns_changes}
           </p>
           <p>
             <span className="font-semibold">WHOIS Changes: </span>
-            TBD
+            {stats.whois_changes}
           </p>
         </div>
       </div>

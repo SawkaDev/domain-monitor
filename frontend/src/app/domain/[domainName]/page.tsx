@@ -13,6 +13,7 @@ import { WhoIsHistoryTab } from "./components/WhoIsHistoryTab";
 import { Loading } from "@/components/ui/Loading";
 import { DNSService } from "@/utils/dnsService";
 import { WhoIsService } from "@/utils/whoisService";
+import { DomainService } from "@/utils/domainService";
 
 export default function DomainProfile() {
   const params = useParams();
@@ -38,15 +39,22 @@ export default function DomainProfile() {
     staleTime: 1000 * 60 * 5,
   });
 
+  const { data: domainStats, isLoading: domainStatsLoading } = useQuery({
+    queryKey: ["stats", domainName],
+    queryFn: () => DomainService.fetchStats(domainName),
+    enabled: !!domainName,
+    staleTime: 1000 * 60 * 5,
+  });
+
   const handleNotification = (message: string, type: "success" | "error") => {
     setNotification({ message, type });
   };
 
-  if (dnsLoading) {
+  if (dnsLoading || whoisloading || domainStatsLoading) {
     return <Loading />;
   }
 
-  if (!domainName) {
+  if (!domainName || !currentDNS || !currentWhois || !domainStats) {
     return (
       <div className="container mx-auto px-4 py-8">
         No information found for this domain.
@@ -110,11 +118,12 @@ export default function DomainProfile() {
           WHOIS History
         </TabButton>
       </div>
-
+      {JSON.stringify(domainStats)}
       {activeTab === "overview" && (
         <OverviewTabMain
           currentDNSrecords={currentDNS ? currentDNS.length : 0}
-          whoIsInfo={currentWhois ? currentWhois : {}}
+          whoIsInfo={currentWhois}
+          stats={domainStats}
         />
       )}
 

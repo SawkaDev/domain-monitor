@@ -36,6 +36,17 @@ def get_all_domains():
         current_app.logger.error(f"Error retrieving domains: {str(e)}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
 
+@bp.route('/domain/stats/<string:domain_name>', methods=['GET'])
+def get_domain_stats(domain_name):
+    try:
+        stats = DomainService.get_stats(domain_name)
+        if stats is None:
+            return jsonify({'error': 'Domain not found'}), 404
+        return jsonify(stats), 200
+    except Exception as e:
+        current_app.logger.error(f"Error retrieving domain stats: {str(e)}")
+        return jsonify({'error': 'An unexpected error occurred'}), 500
+
 @bp.route('/heartbeat', methods=['GET'])
 def heartbeat():
     return jsonify({'status': 'ok'}), 200

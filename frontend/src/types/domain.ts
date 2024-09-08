@@ -46,3 +46,10 @@ export interface WHOISHistoryEntry {
   new_value: string;
   changed_at: string;
 }
+
+export interface DomainStats {
+  dns_changes: number;
+  whois_changes: number;
+  created_at: string;
+  updated_at: string;
+}

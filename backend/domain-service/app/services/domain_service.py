@@ -14,3 +14,16 @@ class DomainService:
     @staticmethod
     def get_all_domains():
         return Domain.query.all()
+
+    @staticmethod
+    def get_stats(domain_name):
+        entry = Domain.query.filter_by(name=domain_name).first()
+        if not entry:
+            return None
+        
+        return {
+            'created_at': entry.created_at.isoformat(),
+            'updated_at': entry.updated_at.isoformat(),
+            'dns_changes': 10,
+            'whois_changes': 5
+        }
