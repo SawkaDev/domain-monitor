@@ -1,4 +1,5 @@
-import whois
+import whoisit
+from whoisit import domain as whois_domain
 from flask import current_app
 from sqlalchemy.orm import Session
 from app.extensions import db
@@ -7,15 +8,58 @@ from typing import List, Optional, Tuple
 from app.models.whois import Domain, CurrentWhois, WhoisHistory
 
 class WhoisService:
+
+    _bootstrap_loaded = False
+
+    @staticmethod
+    def _load_bootstrap():
+        if not WhoisService._bootstrap_loaded:
+            try:
+                whoisit.bootstrap()
+                WhoisService._bootstrap_loaded = True
+                current_app.logger.info("WHOIS bootstrap data loaded successfully")
+            except Exception as e:
+                current_app.logger.error(f"Error loading WHOIS bootstrap data: {str(e)}")
+
     @staticmethod
     def _get_whois_data(domain_name: str) -> Optional[dict]:
         if not domain_name:
             current_app.logger.error("Domain name is empty")
             return None
 
+        WhoisService._load_bootstrap()
+
         try:
-            w = whois.whois(domain_name)
-            return w
+            result = whois_domain(domain_name)
+            
+            registrar = result.get('entities', {}).get('registrar', [{}])[0]
+            registrant = result.get('entities', {}).get('registrant', [{}])[0]
+
+            whois_dict = {
+                'dnssec': result.get('dnssec', False),
+                'registrant': {
+                    'address': {
+                        'country': registrant.get('address', {}).get('country'),
+                        'locality': registrant.get('address', {}).get('locality'),
+                        'postal_code': registrant.get('address', {}).get('postal_code'),
+                        'region': registrant.get('address', {}).get('region'),
+                        'street_address': registrant.get('address', {}).get('street_address')
+                    },
+                    'email': registrant.get('email'),
+                    'name': registrant.get('name'),
+                    'tel': registrant.get('tel')
+                },
+                'registrar': registrar.get('name'),
+                'expiration_date': result.get('expiration_date'),
+                'last_changed_date': result.get('last_changed_date'),
+                'name': result.get('name'),
+                'nameservers': ','.join(ns.rstrip('.') for ns in result.get('nameservers', [])),
+                'registration_date': result.get('registration_date'),
+                'status': ','.join(result.get('status', [])),
+                'terms_of_service_url': result.get('terms_of_service_url'),
+                'type': result.get('type')
+            }
+            return whois_dict
         except Exception as e:
             current_app.logger.error(f"Error fetching WHOIS data for {domain_name}: {str(e)}")
             return None
