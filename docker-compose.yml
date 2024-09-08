@@ -39,6 +39,26 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  whois-service:
+    container_name: whois-service
+    build:
+      context: ./backend/whois-service
+      dockerfile: whois-service.dockerfile
+    ports:
+      - "5002:5002"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db/whois_service
+      - SECRET_KEY=your_secret_key_here
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - DEBUG=True
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
   db:
     container_name: dm-db
     image: postgres:13

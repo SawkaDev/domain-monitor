@@ -19,7 +19,7 @@ def init_scheduler(app):
     logging.getLogger('apscheduler').setLevel(logging.WARNING)
     scheduler.start()
 
-    @scheduler.task('interval', id='update_dns_records', minutes=10, misfire_grace_time=900)
+    @scheduler.task('interval', id='update_dns_records', minutes=30, misfire_grace_time=900)
     def scheduled_update_dns_records():
         with app.app_context():
             domains = Domain.query.all()
