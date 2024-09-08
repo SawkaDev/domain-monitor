@@ -19,7 +19,7 @@ def init_scheduler(app):
     logging.getLogger('apscheduler').setLevel(logging.WARNING)
     scheduler.start()
 
-    @scheduler.task('interval', id='update_whois_records', hours=24, misfire_grace_time=3600)
+    @scheduler.task('interval', id='update_whois_records', minutes=30, misfire_grace_time=3600)
     def scheduled_update_whois_records():
         with app.app_context():
             domains = Domain.query.all()

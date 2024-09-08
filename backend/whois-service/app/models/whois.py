@@ -119,12 +119,12 @@ class WhoisHistory(db.Model):
     # Relationship
     domain = db.relationship('Domain', back_populates='whois_history')
 
-    def __init__(self, domain_id, field_name, old_value, new_value):
+    def __init__(self, domain_id, field_name, old_value, new_value, changed_at):
         self.domain_id = domain_id
         self.field_name = field_name
         self.old_value = old_value
         self.new_value = new_value
-
+        self.changed_at = changed_at
     def to_dict(self):
         return {
             'id': self.id,

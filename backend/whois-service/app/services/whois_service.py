@@ -6,6 +6,9 @@ from app.extensions import db
 from datetime import datetime
 from typing import List, Optional, Tuple
 from app.models.whois import Domain, CurrentWhois, WhoisHistory
+from datetime import datetime
+from dateutil import parser
+import pytz
 
 class WhoisService:
 
@@ -134,20 +137,54 @@ class WhoisService:
                 current_app.logger.error(f"No current WHOIS record found for {domain_name}")
                 return False
 
-            timestamp = datetime.now()
+            timestamp = datetime.now(pytz.utc)
+
+            def normalize_datetime(dt):
+                if dt is None:
+                    return None
+                if isinstance(dt, str):
+                    dt = parser.parse(dt)
+                if dt.tzinfo is None:
+                    dt = pytz.utc.localize(dt)
+                else:
+                    dt = dt.astimezone(pytz.utc)
+                return dt.replace(tzinfo=None)  # Remove timezone info for comparison
+
+            def format_for_storage(dt):
+                if dt is None:
+                    return None
+                if dt.tzinfo is None:
+                    dt = pytz.utc.localize(dt)
+                return dt.isoformat()
 
             # Check for changes and update history
             for field, new_value in whois_data.items():
                 old_value = getattr(current_record, field)
-                if old_value != new_value:
-                    session.add(WhoisHistory(
-                        domain_id=domain.id,
-                        field_name=field,
-                        old_value=str(old_value),
-                        new_value=str(new_value),
-                        changed_at=timestamp
-                    ))
-                    setattr(current_record, field, new_value)
+                # Handle date fields
+                if field in ['registration_date', 'expiration_date', 'last_changed_date']:
+                    old_value_normalized = normalize_datetime(old_value)
+                    new_value_normalized = normalize_datetime(new_value)
+                    
+                    if old_value_normalized != new_value_normalized:
+                        session.add(WhoisHistory(
+                            domain_id=domain.id,
+                            field_name=field,
+                            old_value=format_for_storage(old_value),
+                            new_value=format_for_storage(new_value),
+                            changed_at=timestamp
+                        ))
+                        setattr(current_record, field, new_value)
+                else:
+                    # Handle non-date fields
+                    if old_value != new_value:
+                        session.add(WhoisHistory(
+                            domain_id=domain.id,
+                            field_name=field,
+                            old_value=str(old_value),
+                            new_value=str(new_value),
+                            changed_at=timestamp
+                        ))
+                        setattr(current_record, field, new_value)
 
             current_record.updated_at = timestamp
             session.commit()

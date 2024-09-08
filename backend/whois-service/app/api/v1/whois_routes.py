@@ -2,15 +2,6 @@ from flask import jsonify, request
 from app.api.v1 import bp
 from app.services.whois_service import WhoisService
 
-# TODO: testing only remoe eventaully
-@bp.route('/whois/test/<string:domain>', methods=['GET'])
-def get_whois_recordtest(domain):
-    record = WhoisService._get_whois_data(domain)
-    if record:
-        return jsonify(record), 200
-    else:
-        return jsonify({}), 200
-
 @bp.route('/whois/<string:domain>', methods=['GET'])
 def get_whois_record(domain):
     record = WhoisService.get_current_whois_record(domain)
@@ -27,7 +18,7 @@ def get_whois_history(domain):
     else:
         return jsonify([]), 200
 
-# TODO: helper route for now instead of using the scheduler
+# TODO: Manual Trigger To Update. This will be removed in the future
 @bp.route('/whois/<domain_name>', methods=['POST'])
 def update_whois_record(domain_name):
     success = WhoisService.update_whois_record(domain_name)

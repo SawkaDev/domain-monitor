@@ -16,7 +16,7 @@ def create_app():
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    # init_scheduler(app)
+    init_scheduler(app)
 
     db.init_app(app)
     migrate.init_app(app, db)
