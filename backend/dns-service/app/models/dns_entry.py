@@ -4,7 +4,7 @@ from datetime import datetime
 class Domain(db.Model):
     __tablename__ = 'domains'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=False)
     name = db.Column(db.String(255), unique=True, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -21,9 +21,12 @@ class Domain(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
+
+    def __repr__(self):
+        return f'<Domain {self.name}>'
 
 class CurrentDNSRecord(db.Model):
     __tablename__ = 'current_dns_records'
@@ -49,8 +52,11 @@ class CurrentDNSRecord(db.Model):
             'domain_id': self.domain_id,
             'record_type': self.record_type,
             'value': self.value,
-            'last_updated': self.last_updated
+            'last_updated': self.last_updated.isoformat() if self.last_updated else None
         }
+
+    def __repr__(self):
+        return f'<CurrentDNSRecord {self.domain_id}: {self.record_type}>'
 
 class DNSEntryHistory(db.Model):
     __tablename__ = 'dns_entry_history'
@@ -78,6 +84,9 @@ class DNSEntryHistory(db.Model):
             'domain_id': self.domain_id,
             'record_type': self.record_type,
             'value': self.value,
-            'timestamp': self.timestamp,
+            'timestamp': self.timestamp.isoformat() if self.timestamp else None,
             'change_type': self.change_type
         }
+
+    def __repr__(self):
+        return f'<DNSEntryHistory {self.domain_id}: {self.record_type} - {self.change_type}>'

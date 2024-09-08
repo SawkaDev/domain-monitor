@@ -52,7 +52,7 @@ class DNSService:
     def create_or_get_domain(domain_name: str, domain_id: int) -> Tuple[Domain, bool]:
         session = db.session
         try:
-            domain = Domain.query.filter_by(id=domain_id, name=domain_name).first()
+            domain = Domain.query.filter_by(id=domain_id).first()
             if domain:
                 return domain, False
             
@@ -67,6 +67,8 @@ class DNSService:
 
     @staticmethod
     def create_initial_dns_records(domain_name: str, domain_id: int) -> bool:
+
+        current_app.logger.info(f"Creating initial DNS records for {domain_name}")
         if not domain_name or not domain_id:
             current_app.logger.error("Domain name is empty or domain ID is empty")
             return False

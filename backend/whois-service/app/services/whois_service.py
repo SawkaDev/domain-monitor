@@ -68,7 +68,7 @@ class WhoisService:
     def create_or_get_domain(domain_name: str, domain_id: int) -> Tuple[Domain, bool]:
         session = db.session
         try:
-            domain = Domain.query.filter_by(id=domain_id, name=domain_name).first()
+            domain = Domain.query.filter_by(id=domain_id).first()
             if domain:
                 return domain, False
             
@@ -105,7 +105,7 @@ class WhoisService:
             new_record = CurrentWhois(
                 domain_id=domain_id,
                 registrar=whois_data['registrar'],
-                creation_date=whois_data['creation_date'],
+                creation_date=whois_data['expiration_date'],
                 expiration_date=whois_data['expiration_date'],
                 last_updated_date=whois_data['last_updated'],
                 name_servers=','.join(whois_data['name_servers']) if whois_data['name_servers'] else None,

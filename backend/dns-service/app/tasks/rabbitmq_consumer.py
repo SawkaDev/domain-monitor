@@ -12,8 +12,11 @@ def callback(ch, method, properties, body):
 
             try:
                 from app.services.dns_service import DNSService
-                DNSService.create_initial_dns_records(domain, domain_id)
-                current_app.logger.info(f"Created initial DNS records for {domain}")
+                success = DNSService.create_initial_dns_records(domain, domain_id)
+                if success:
+                    current_app.logger.info(f"Created initial DNS records for {domain}")
+                else:
+                    current_app.logger.info(f"Erorr Creating initial DNS records for {domain}")
             except Exception as e:
                 current_app.logger.error(f"Error creating DNS records for {domain}: {str(e)}")
     ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -27,17 +30,20 @@ def start_consuming(app):
         channel = connection.channel()
 
         channel.exchange_declare(exchange=rabbitmq_exchange, exchange_type='fanout', durable=True)
-        result = channel.queue_declare(queue='', exclusive=True)
-        queue_name = result.method.queue
-        channel.queue_bind(exchange=rabbitmq_exchange, queue=queue_name)
+        
+        # Use a named queue for the DNS service
+        queue_name = 'dns_service_queue'
+        result = channel.queue_declare(queue=queue_name, durable=True)
+        channel.queue_bind(exchange=rabbitmq_exchange, queue=queue_name)   
         channel.basic_qos(prefetch_count=1)
         channel.basic_consume(queue=queue_name, on_message_callback=callback)
-        app.logger.info('DNS service waiting for messages...')
+        app.logger.info(f'DNS service waiting for messages on queue: {queue_name}')
         
         channel.start_consuming()
 
 def init_rabbitmq_consumer(app):
-    import threading
-    consumer_thread = threading.Thread(target=start_consuming, args=(app,))
-    consumer_thread.daemon = True
-    consumer_thread.start()
+    if not hasattr(app, 'rabbitmq_consumer_thread'):
+        import threading
+        app.rabbitmq_consumer_thread = threading.Thread(target=start_consuming, args=(app,))
+        app.rabbitmq_consumer_thread.daemon = True
+        app.rabbitmq_consumer_thread.start()

@@ -4,14 +4,14 @@ from datetime import datetime
 class Domain(db.Model):
     __tablename__ = 'domains'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=False)
     name = db.Column(db.String(255), unique=True, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    current_whois = db.relationship('CurrentWhois', back_populates='domain', uselist=False)
-    whois_history = db.relationship('WhoisHistory', back_populates='domain', lazy='dynamic')
+    current_whois = db.relationship('CurrentWhois', back_populates='domain', uselist=False, cascade="all, delete-orphan")
+    whois_history = db.relationship('WhoisHistory', back_populates='domain', lazy='dynamic', cascade="all, delete-orphan")
 
     def __init__(self, name, id):
         self.name = name
@@ -21,9 +21,12 @@ class Domain(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
+
+    def __repr__(self):
+        return f'<Domain {self.name}>'
 
 class CurrentWhois(db.Model):
     __tablename__ = 'current_whois'
@@ -41,6 +44,7 @@ class CurrentWhois(db.Model):
     expiration_date = db.Column(db.DateTime)
     last_updated_date = db.Column(db.DateTime)
     raw_data = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationship
@@ -72,11 +76,15 @@ class CurrentWhois(db.Model):
             'admin_email': self.admin_email,
             'tech_email': self.tech_email,
             'name_servers': self.name_servers,
-            'creation_date': self.creation_date,
-            'expiration_date': self.expiration_date,
-            'last_updated_date': self.last_updated_date,
-            'updated_at': self.updated_at
+            'creation_date': self.creation_date.isoformat() if self.creation_date else None,
+            'expiration_date': self.expiration_date.isoformat() if self.expiration_date else None,
+            'last_updated_date': self.last_updated_date.isoformat() if self.last_updated_date else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
+
+    def __repr__(self):
+        return f'<CurrentWhois {self.domain_id}>'
 
 class WhoisHistory(db.Model):
     __tablename__ = 'whois_history'
@@ -104,5 +112,8 @@ class WhoisHistory(db.Model):
             'field_name': self.field_name,
             'old_value': self.old_value,
             'new_value': self.new_value,
-            'changed_at': self.changed_at
+            'changed_at': self.changed_at.isoformat() if self.changed_at else None
         }
+
+    def __repr__(self):
+        return f'<WhoisHistory {self.domain_id}: {self.field_name}>'
