@@ -116,8 +116,9 @@ export default function DomainProfile() {
   }
 
   if (!isReadyForQueries) {
-    return <Loading text="New domain to monitor! Records are being prepared. Please wait..." />;
-
+    return (
+      <Loading text="New domain to monitor! Records are being prepared. Please wait..." />
+    );
   }
 
   if (dnsLoading || whoisLoading || domainStatsLoading) {

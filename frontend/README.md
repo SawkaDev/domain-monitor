@@ -1,6 +1,6 @@
 # DNS Monitoring Service Frontend
 
-This is the frontend application for the DNS Monitoring Service, built with Next.js. It provides a user-friendly interface for users to search, view, and monitor domain information.
+This is the frontend application for the DNS Monitoring Service, built with Next.js. It provides a user-friendly interface for users to search, view, and monitor domain information in real-time.
 
 ## Features
 
@@ -10,9 +10,8 @@ This is the frontend application for the DNS Monitoring Service, built with Next
   - Current DNS records
   - DNS history
   - WHOIS history
-- **Real-time Monitoring**: Set up notifications for changes to specific domains.
-- **User-friendly Interface**: Clean, modern UI with responsive design for all devices.
-- **Fast Performance**: Utilizes Next.js for server-side rendering and optimal performance.
+- **Real-time Monitoring**: Set up email/sms (mocked for now) notifications for changes to specific domains.
+- **Pagination**: Efficiently browse through large sets of domain data with our paginated interface.
 
 ## Getting Started
 
@@ -44,3 +43,18 @@ Follow these steps to set up the project locally:
      yarn dev
 
 6. Open [http://localhost:3010](http://localhost:3010) in your browser to see the application.
+
+## Usage
+
+- **Search for a Domain**: Use the search bar on the homepage to look up any domain (for new domains we will setup monitoring. From there on out we will track DNS/WHOIS changes).
+- **Subscribe to Notifications**: On a domain's profile page, click the "Get Notifications" button to set up alerts for changes.
+- **Navigate Through Data**: On each domain's profile page you can view an overivew, DNS history, and WHOIS history.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Acknowledgments
+
+- Thanks to all contributors who have helped shape this project.
+- Special thanks to the Next.js and React Query communities for their excellent tools and documentation.

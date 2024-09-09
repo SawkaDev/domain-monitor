@@ -1,6 +1,6 @@
 # Domain Monitor Service
 
-A comprehensive service for tracking and managing DNS records across multiple domains, providing real-time monitoring and historical data tracking.
+A comprehensive service for tracking and managing DNS records and WHOIS information across multiple domains, providing real-time monitoring, historical data tracking, and domain validation.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -12,38 +12,46 @@ A comprehensive service for tracking and managing DNS records across multiple do
   - [Installation](#installation)
 - [Configuration](#configuration)
 - [API Documentation](#api-documentation)
+- [FrontEnd](#frontend)
 - [Access Database](#access-database)
 - [Planned Features](#planned-features)
 
 ## Overview
 
-Domain Monitor offers an easy-to-use platform for managing domain entries, monitoring DNS records, and accessing historical changes. It's designed for system administrators, network engineers, and anyone needing to keep track of DNS changes across multiple domains.
+Domain Monitor offers an easy-to-use platform for managing domain entries, monitoring DNS records and WHOIS information, and accessing historical changes. It's designed for system administrators, network engineers, and anyone needing to keep track of domain-related changes across multiple domains.
 
 ## Features
 
-- Add and manage domains for monitoring
-- Retrieve current DNS records for monitored domains
-- Access historical DNS changes (10 minute updates)
+- Add, validate, and manage domains for monitoring
+- Retrieve current DNS records and WHOIS information for monitored domains
+- Access historical DNS and WHOIS changes
 - Real-time updates via message queue system
 - RESTful API for easy integration
+- Pagination support for efficient data retrieval
+- Domain statistics and change tracking
+- Notification system for domain changes (frontend feature)
 
 ## Architecture
 
 The system is built using a microservices architecture:
 
-1. Domain Service: Manages domain entries and initiates monitoring
+1. Domain Service: Manages domain entries, validates domains, and initiates monitoring
 2. DNS Service: Tracks and provides current and historical DNS records
-3. PostgreSQL Database: Stores domain and DNS record data
-4. RabbitMQ: Handles inter-service communication
+3. WHOIS Service: Tracks and provides current and historical WHOIS information
+4. Frontend Service: Provides user interface for interacting with the system
+5. PostgreSQL Database: Stores domain, DNS record, and WHOIS data
+6. RabbitMQ: Handles inter-service communication
 
 ### Technologies Used
 
 - Python 3.9+
 - Flask: Web framework for building the APIs
 - SQLAlchemy: ORM for database interactions
-- PostgreSQL: Database for storing domain and DNS data
+- PostgreSQL: Database for storing domain, DNS, and WHOIS data
 - RabbitMQ: Message queue for inter-service communication
 - Docker & Docker Compose: Containerization and orchestration
+- Next.js: Frontend framework for the user interface
+- React Query: Data fetching and state management in the frontend
 
 ## Getting Started
 
@@ -53,6 +61,7 @@ The system is built using a microservices architecture:
 - Python 3.9+
 - PostgreSQL
 - RabbitMQ
+- Node.js (for frontend development)
 
 ### Installation
 
@@ -64,6 +73,11 @@ The system is built using a microservices architecture:
 
 3. Build and start the services:
    docker-compose up --build
+
+4. For frontend development:
+   cd frontend
+   npm install
+   npm run dev
 
 ## Configuration
 
@@ -80,20 +94,25 @@ For detailed API documentation, please refer to the following README files:
 
 - [Domain Service README](./backend/domain-service/README.md)
 - [DNS Service README](./backend/dns-service/README.md)
+- [WHOIS Service README](./backend/whois-service/README.md)
+
+## Frontend
+
+The frontend provides a user-friendly interface for interacting with the Domain Monitor Service. Key features include:
+
+- Domain search and validation
+- Comprehensive domain profiles with DNS and WHOIS information
+- Historical data visualization
+- Notification subscription for domain changes
+
+For more details, see the [Frontend README](./frontend/README.md).
 
 ## Planned Features
 - SSL Monitoring
-- WHOIS Data Monitoring: 
-  - Registrar details
-  - Registration and expiration dates
-  - Name servers
-  - Registrant information (if available)
-- Alert System
+- Enhanced Alert System
   - Email, SMS, webhooks
-- UI
-  - add domain
-  - dns / whois changes
-  - update alerts
-- Caching (redis) 
-- Rate limiting
-- Input validation / sanitation
+- Caching (Redis) for improved performance
+- Rate limiting for API protection
+- Export of Historical Data
+- Advanced analytics and reporting
+- User authentication and personalized watchlists
