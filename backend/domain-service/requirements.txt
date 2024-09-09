@@ -10,3 +10,4 @@ dnspython==2.1.0
 sqlalchemy_utils
 pika==1.3.2
 Flask-CORS==3.0.10
+requests==2.26.0

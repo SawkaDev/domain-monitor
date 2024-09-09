@@ -157,7 +157,7 @@ class WhoisService:
                     dt = pytz.utc.localize(dt)
                 return dt.isoformat()
 
-            # Check for changes and update history
+            changes_count = 0
             for field, new_value in whois_data.items():
                 old_value = getattr(current_record, field)
                 # Handle date fields
@@ -173,6 +173,7 @@ class WhoisService:
                             new_value=format_for_storage(new_value),
                             changed_at=timestamp
                         ))
+                        changes_count += 1
                         setattr(current_record, field, new_value)
                 else:
                     # Handle non-date fields
@@ -184,8 +185,10 @@ class WhoisService:
                             new_value=str(new_value),
                             changed_at=timestamp
                         ))
+                        changes_count += 1
                         setattr(current_record, field, new_value)
 
+            domain.changes += changes_count
             current_record.updated_at = timestamp
             session.commit()
             return True
@@ -216,4 +219,16 @@ class WhoisService:
             return CurrentWhois.query.filter_by(domain_id=domain.id).first()
         except Exception as e:
             current_app.logger.error(f"Error in get_current_whois_record: {str(e)}")
+            return None
+
+    @staticmethod
+    def get_whois_changes(domain: str):
+        try:
+            domain = Domain.query.filter_by(name=domain).first()
+            if not domain:
+                current_app.logger.error(f"Domain {domain} not found in database")
+                return None
+            return domain
+        except Exception as e:
+            current_app.logger.error(f"Error in get_current_dns_records: {str(e)}")
             return None

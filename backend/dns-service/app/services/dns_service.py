@@ -132,6 +132,7 @@ class DNSService:
             current_set = {(r['record_type'], r['value']) for r in current_records}
 
             timestamp = datetime.now()
+            changes_count = 0
 
             # Find additions
             additions = current_set - existing_set
@@ -150,6 +151,7 @@ class DNSService:
                     timestamp=timestamp,
                     change_type='ADDED'
                 ))
+                changes_count += 1  # Increment the changes count
 
             # Find deletions
             deletions = existing_set - current_set
@@ -163,6 +165,10 @@ class DNSService:
                     timestamp=timestamp,
                     change_type='DELETED'
                 ))
+                changes_count += 1
+
+            domain.changes += changes_count
+            domain.updated_at = timestamp
 
             session.commit()
             return True
@@ -194,3 +200,15 @@ class DNSService:
         except Exception as e:
             current_app.logger.error(f"Error in get_current_dns_records: {str(e)}")
             return []
+
+    @staticmethod
+    def get_dns_changes(domain: str):
+        try:
+            domain = Domain.query.filter_by(name=domain).first()
+            if not domain:
+                current_app.logger.error(f"Domain {domain} not found in database")
+                return None
+            return domain
+        except Exception as e:
+            current_app.logger.error(f"Error in get_current_dns_records: {str(e)}")
+            return None

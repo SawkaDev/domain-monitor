@@ -38,3 +38,11 @@ def create_initial_whois_record(domain):
     
     success = WhoisService.create_initial_whois_record(domain, domain_id)
     return jsonify({"status": success}), 200 if success else 500
+
+@bp.route('/whois/changes/<string:domain>', methods=['GET'])
+def get_whois_changes(domain):
+    changes = WhoisService.get_whois_changes(domain)
+    if changes:
+        return jsonify(changes.to_dict()), 200
+    else:
+        return jsonify({"error": "Domain not found"}), 404

@@ -28,3 +28,11 @@ def update_dns_records(domain_name):
 @bp.route('/dns/heartbeat', methods=['GET'])
 def heartbeat():
     return jsonify({'status': 'ok'}), 200
+
+@bp.route('/dns/changes/<string:domain>', methods=['GET'])
+def get_dns_changes(domain):
+    changes = DNSService.get_dns_changes(domain)
+    if changes:
+        return jsonify(changes.to_dict()), 200
+    else:
+        return jsonify({"error": "Domain not found"}), 404

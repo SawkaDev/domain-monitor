@@ -118,7 +118,6 @@ export default function DomainProfile() {
           WHOIS History
         </TabButton>
       </div>
-      {JSON.stringify(domainStats)}
       {activeTab === "overview" && (
         <OverviewTabMain
           currentDNSrecords={currentDNS ? currentDNS.length : 0}

@@ -29,7 +29,7 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
         <div className="space-y-3">
           <p>
             <span className="font-semibold">Registrar: </span>
-            {whoIsInfo.registrar}
+            {whoIsInfo.registrar || "n/a"}
           </p>
           <p>
             <span className="font-semibold">Creation Date: </span>

@@ -6,6 +6,7 @@ class Domain(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=False)
     name = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    changes = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -21,6 +22,7 @@ class Domain(db.Model):
         return {
             'id': self.id,
             'name': self.name,
+            'changes': self.changes,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
