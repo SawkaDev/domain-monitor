@@ -53,3 +53,13 @@ export interface DomainStats {
   created_at: string;
   updated_at: string;
 }
+
+export interface Domain {
+  id: number;
+  name: string;
+}
+
+export interface DomainResponse {
+  domains: Domain[];
+  total: number;
+}

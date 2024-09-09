@@ -13,8 +13,10 @@ class DomainService:
         return entry
 
     @staticmethod
-    def get_all_domains():
-        return Domain.query.all()
+    def get_domains_paginated(page, limit):
+        domains = Domain.query.order_by(Domain.id.desc()).paginate(page=page, per_page=limit, error_out=False)
+        total = Domain.query.count()
+        return domains.items, total
 
     @staticmethod
     def get_stats(domain_name):

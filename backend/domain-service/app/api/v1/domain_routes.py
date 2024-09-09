@@ -30,8 +30,15 @@ def add_dns_entry():
 @bp.route('/domains', methods=['GET'])
 def get_all_domains():
     try:
-        domains = DomainService.get_all_domains()
-        return jsonify([domain.to_dict() for domain in domains]), 200
+        page = request.args.get('page', 1, type=int)
+        limit = request.args.get('limit', 20, type=int)
+        domains, total = DomainService.get_domains_paginated(page, limit)
+        return jsonify({
+            'domains': [domain.to_dict() for domain in domains],
+            'total': total,
+            'page': page,
+            'limit': limit
+        }), 200
     except Exception as e:
         current_app.logger.error(f"Error retrieving domains: {str(e)}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
