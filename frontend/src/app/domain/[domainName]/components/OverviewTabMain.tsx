@@ -57,7 +57,7 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
             {formatDate(stats.created_at)}
           </p>
           <p>
-            <span className="font-semibold">Last Monitored: </span>
+            <span className="font-semibold">Most Recent DNS/WhoIs Change: </span>
             {new Date(stats.updated_at).toLocaleString()}
           </p>
           <p>

@@ -1,5 +1,6 @@
 from app.models.domain import Domain
 from app.extensions import db
+from datetime import datetime
 import dns.resolver
 from flask import current_app
 import requests
@@ -24,9 +25,13 @@ class DomainService:
         dns_data = DomainService.get_dns_changes(domain_name)
         whois_data = DomainService.get_whois_changes(domain_name)
 
+        dns_updated_at = datetime.fromisoformat(dns_data.get('updated_at')) if dns_data and dns_data.get('updated_at') else datetime.min
+        whois_updated_at = datetime.fromisoformat(whois_data.get('updated_at')) if whois_data and whois_data.get('updated_at') else datetime.min
+        most_recent_update = max(dns_updated_at, whois_updated_at)
+
         return {
             'created_at': entry.created_at.isoformat(),
-            'updated_at': entry.updated_at.isoformat(),
+            'updated_at': most_recent_update.isoformat() if most_recent_update != datetime.min else None,
             'dns_changes': dns_data.get('changes', 0) if dns_data else 0,
             'whois_changes': whois_data.get('changes', 0) if whois_data else 0,
         }

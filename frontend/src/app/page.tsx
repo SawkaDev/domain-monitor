@@ -28,35 +28,43 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-12 p-4">
+    <div className="max-w-4xl mx-auto space-y-12 p-4">
       <section className="text-center">
         <h1 className="text-4xl font-bold mb-4 text-text-primary">
-          Welcome to Domain Monitor
+          Domain Monitor Feed
         </h1>
         <p className="text-xl text-text-secondary max-w-2xl mx-auto">
-          View historical domain data and more!
+          Recent domain updates and changes
         </p>
       </section>
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section className="space-y-4">
         {domains && domains.length > 0 ? (
           domains.map((item) => (
             <div
               key={item.id}
-              className="bg-surface p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+              className="bg-surface p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow flex justify-between items-center"
             >
-              <h2 className="text-xl font-semibold mb-2 text-text-primary">
-                <Link
-                  href={`/domain/${item.name}`}
-                  className="text-text-secondary hover:text-text-primary transition-colors"
-                >
-                  {item.name}
-                </Link>
-              </h2>
-              <p className="text-text-secondary">ID: {item.id}</p>
+              <div>
+                <h2 className="text-xl font-semibold text-text-primary">
+                  <Link
+                    href={`/domain/${item.name}`}
+                    className="hover:underline"
+                  >
+                    {item.name}
+                  </Link>
+                </h2>
+                <p className="text-sm text-text-secondary">ID: {item.id}</p>
+              </div>
+              <Link
+                href={`/domain/${item.name}`}
+                className="btn-secondary bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-colors"
+              >
+                View Details
+              </Link>
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center text-gray-500">
+          <div className="text-center text-gray-500">
             No domains found
           </div>
         )}
@@ -64,7 +72,7 @@ export default function Home() {
 
       <section className="text-center">
         <button className="btn-primary bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors">
-          Learn More
+          Load More
         </button>
       </section>
     </div>
