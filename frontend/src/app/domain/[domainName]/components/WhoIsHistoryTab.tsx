@@ -1,7 +1,7 @@
+import { Loading } from "@/components/ui/Loading";
 import { TableCell } from "@/components/ui/TableCell";
 import { TableHeader } from "@/components/ui/TableHeader";
 import { WHOISHistoryEntry } from "@/types/domain";
-import { formatDate } from "@/utils/utils";
 import { WhoIsService } from "@/utils/whoisService";
 import { useQuery } from "@tanstack/react-query";
 
@@ -27,6 +27,14 @@ export const WhoIsHistoryTab: React.FC<WhoIsHistoryTabProps> = ({
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,
   });
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div>
