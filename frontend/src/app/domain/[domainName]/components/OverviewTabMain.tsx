@@ -14,7 +14,10 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
 }) => {
   const daysUntilExpiration = () => {
     const today = new Date();
-    if (whoIsInfo.expiration_date === null) {
+    if (
+      whoIsInfo.expiration_date === null ||
+      whoIsInfo.expiration_date === undefined
+    ) {
       return "n/a";
     }
     const expirationDate = new Date(whoIsInfo.expiration_date);
@@ -33,11 +36,15 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
           </p>
           <p>
             <span className="font-semibold">Creation Date: </span>
-            {formatDate(whoIsInfo.registration_date)}
+            {whoIsInfo.registration_date
+              ? formatDate(whoIsInfo.registration_date)
+              : "n/a"}
           </p>
           <p>
             <span className="font-semibold">Expiration Date: </span>
-            {formatDate(whoIsInfo.expiration_date)}
+            {whoIsInfo.expiration_date
+              ? formatDate(whoIsInfo.expiration_date)
+              : "n/a"}
           </p>
           <p>
             <span className="font-semibold">Days Until Expiration: </span>
@@ -45,7 +52,7 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
           </p>
           <p>
             <span className="font-semibold">Name Servers: </span>
-            {whoIsInfo.nameservers}
+            {whoIsInfo.nameservers ? whoIsInfo.nameservers : "n/a"}
           </p>
         </div>
       </div>

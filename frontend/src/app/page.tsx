@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { Domain, DomainResponse } from "@/types/domain";
 
-const DOMAINS_PER_PAGE = 10;
+const DOMAINS_PER_PAGE = 5;
 
 export default function Home() {
   const [page, setPage] = useState(1);
@@ -18,6 +18,7 @@ export default function Home() {
   >({
     queryKey: ["domains", page],
     queryFn: () => DomainService.fetchDomains(page, DOMAINS_PER_PAGE),
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {

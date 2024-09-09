@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -14,6 +14,7 @@ import { Loading } from "@/components/ui/Loading";
 import { DNSService } from "@/utils/dnsService";
 import { WhoIsService } from "@/utils/whoisService";
 import { DomainService } from "@/utils/domainService";
+import { DomainValidity } from "@/types/domain";
 
 export default function DomainProfile() {
   const params = useParams();
@@ -25,43 +26,123 @@ export default function DomainProfile() {
     type: "success" | "error";
   } | null>(null);
 
-  const { data: currentDNS, isLoading: dnsLoading } = useQuery({
+  const [isReadyForQueries, setIsReadyForQueries] = useState(false);
+
+  const {
+    data: valid,
+    isLoading: validLoading,
+    isError: isValidError,
+    error: validError,
+    refetch: refetchValidation,
+  } = useQuery<DomainValidity, Error>({
+    queryKey: ["validateDomain", domainName],
+    queryFn: () => DomainService.checkOrCreateDomainRecord(domainName),
+    enabled: !!domainName,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (valid && valid.exists) {
+      if (!valid.records_ready) {
+        timer = setInterval(() => {
+          refetchValidation();
+        }, 5000);
+      } else {
+        setIsReadyForQueries(true);
+      }
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [valid, refetchValidation]);
+
+  const {
+    data: currentDNS,
+    isLoading: dnsLoading,
+    isError: isDNSError,
+    error: dnsError,
+  } = useQuery({
     queryKey: ["currentDNS", domainName],
     queryFn: () => DNSService.fetchCurrentDNS(domainName),
-    enabled: !!domainName,
-    staleTime: 1000 * 60 * 5,
+    enabled: isReadyForQueries,
   });
 
-  const { data: currentWhois, isLoading: whoisloading } = useQuery({
+  const {
+    data: currentWhois,
+    isLoading: whoisLoading,
+    isError: isWhoisError,
+    error: whoisError,
+  } = useQuery({
     queryKey: ["whoisData", domainName],
     queryFn: () => WhoIsService.fetchWhoIs(domainName),
-    enabled: !!domainName,
-    staleTime: 1000 * 60 * 5,
+    enabled: isReadyForQueries,
   });
 
-  const { data: domainStats, isLoading: domainStatsLoading } = useQuery({
+  const {
+    data: domainStats,
+    isLoading: domainStatsLoading,
+    isError: isDomainStatsError,
+    error: domainStatsError,
+  } = useQuery({
     queryKey: ["stats", domainName],
     queryFn: () => DomainService.fetchStats(domainName),
-    enabled: !!domainName,
-    staleTime: 1000 * 60 * 5,
+    enabled: isReadyForQueries,
   });
 
   const handleNotification = (message: string, type: "success" | "error") => {
     setNotification({ message, type });
   };
 
-  if (dnsLoading || whoisloading || domainStatsLoading) {
+  if (validLoading) {
     return <Loading />;
   }
 
-  if (!domainName || !currentDNS || !currentWhois || !domainStats) {
+  if (isValidError) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        Error validating domain: {validError.message}
+      </div>
+    );
+  }
+
+  if (!valid?.exists) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        Domain does not exist in our records.
+      </div>
+    );
+  }
+
+  if (!isReadyForQueries) {
+    return <Loading text="New domain to monitor! Records are being prepared. Please wait..." />;
+
+  }
+
+  if (dnsLoading || whoisLoading || domainStatsLoading) {
+    return <Loading />;
+  }
+
+  if (isDNSError || isWhoisError || isDomainStatsError) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        {isDNSError && <p>Error loading DNS data: {dnsError.message}</p>}
+        {isWhoisError && <p>Error loading WHOIS data: {whoisError.message}</p>}
+        {isDomainStatsError && (
+          <p>Error loading domain stats: {domainStatsError.message}</p>
+        )}
+      </div>
+    );
+  }
+
+  if (!currentDNS || !currentWhois || !domainStats) {
     return (
       <div className="container mx-auto px-4 py-8">
         No information found for this domain.
       </div>
     );
   }
-
   return (
     <div className="container mx-auto px-4 py-8 relative">
       <div className="flex justify-between items-center mb-6">

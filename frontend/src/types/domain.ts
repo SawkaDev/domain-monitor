@@ -63,3 +63,9 @@ export interface DomainResponse {
   domains: Domain[];
   total: number;
 }
+
+export interface DomainValidity {
+  exists: boolean;
+  added?: boolean;
+  records_ready: boolean;
+}

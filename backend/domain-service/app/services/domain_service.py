@@ -65,3 +65,7 @@ class DomainService:
         except requests.RequestException as e:
             current_app.logger.error(f"Error fetching Whois changes for {domain_name}: {str(e)}")
             return None
+
+    @staticmethod
+    def domain_exists(domain_name):
+        return Domain.query.filter_by(name=domain_name).first()

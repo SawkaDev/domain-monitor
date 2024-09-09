@@ -1,4 +1,4 @@
-import { DomainStats } from "@/types/domain";
+import { DomainStats, DomainValidity } from "@/types/domain";
 import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/v1";
@@ -12,10 +12,18 @@ const api = axios.create({
   timeout: 5000,
 });
 
-const fetchDomains = async (page = 1, limit = 20): Promise<{ domains: Domain[], total: number }> => {
+const fetchDomains = async (
+  page = 1,
+  limit = 20
+): Promise<{ domains: Domain[]; total: number }> => {
   try {
-    const response = await api.get<{ domains: Domain[], total: number, page: number, limit: number }>("/domains", {
-      params: { page, limit }
+    const response = await api.get<{
+      domains: Domain[];
+      total: number;
+      page: number;
+      limit: number;
+    }>("/domains", {
+      params: { page, limit },
     });
     return response.data;
   } catch (error) {
@@ -34,7 +42,20 @@ const fetchStats = async (domainName: string): Promise<DomainStats> => {
   }
 };
 
+const checkOrCreateDomainRecord = async (
+  domainName: string
+): Promise<DomainValidity> => {
+  try {
+    const response = await api.post(`/domain/validate`, { domain: domainName });
+    return response.data;
+  } catch (error) {
+    console.error("Error Checking/Validating Domain:", error);
+    return { exists: false, records_ready: false };
+  }
+};
+
 export const DomainService = {
   fetchDomains,
   fetchStats,
+  checkOrCreateDomainRecord,
 };
