@@ -59,6 +59,21 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: frontend.dockerfile
+    ports:
+      - "3010:3010"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
   db:
     container_name: dm-db
     image: postgres:13
