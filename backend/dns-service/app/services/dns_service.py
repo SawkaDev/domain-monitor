@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import List, Optional, Tuple
 from sqlalchemy.exc import InvalidRequestError
 from app.models.dns_entry import Domain
+from app.tasks.notification_producer import send_notification_message
 
 from app.models import CurrentDNSRecord, DNSEntryHistory
 
@@ -166,6 +167,9 @@ class DNSService:
                     change_type='DELETED'
                 ))
                 changes_count += 1
+
+            if changes_count > 0:
+                send_notification_message('dns_notification', {'domain': domain})
 
             domain.changes += changes_count
             domain.updated_at = timestamp

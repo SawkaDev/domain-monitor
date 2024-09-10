@@ -4,6 +4,7 @@ from app.extensions import db, migrate
 from app.config import config
 from sqlalchemy_utils import database_exists, create_database
 import os
+from app.tasks.notification_consumer import init_rabbitmq_consumer
 
 def create_app():
     app = Flask(__name__)
@@ -15,6 +16,8 @@ def create_app():
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
+    init_rabbitmq_consumer(app)
+    
     db.init_app(app)
     migrate.init_app(app, db)
 

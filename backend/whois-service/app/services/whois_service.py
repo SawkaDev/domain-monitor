@@ -188,6 +188,9 @@ class WhoisService:
                         changes_count += 1
                         setattr(current_record, field, new_value)
 
+            if changes_count > 0:
+                send_notification_message('whois_notification', {'domain': domain_name})
+
             domain.changes += changes_count
             current_record.updated_at = timestamp
             session.commit()
