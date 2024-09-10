@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import { NotificationService } from "@/utils/notificationService";
+import React, { useState } from "react";
 
 interface NotificationPopupProps {
   domainName: string;
   onClose: () => void;
-  onNotification: (message: string, type: 'success' | 'error') => void;
+  onNotification: (message: string, type: "success" | "error") => void;
 }
 
-export const NotificationPopup: React.FC<NotificationPopupProps> = ({ 
-  domainName, 
+export const NotificationPopup: React.FC<NotificationPopupProps> = ({
+  domainName,
   onClose,
-  onNotification 
+  onNotification,
 }) => {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,19 +19,28 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          // Simulate a subscription request
-          // reject(new Error("Failed to subscribe"));
-          resolve(true);
-        }, 1000);
-      });
-      onNotification(`Successfully subscribed ${email} to updates for ${domainName}`, 'success');
+      await NotificationService.addNotification(domainName, email);
+      onNotification(
+        `Successfully subscribed ${email} to updates for ${domainName}`,
+        "success"
+      );
       setEmail("");
       onClose();
     } catch (error) {
-      onNotification('An error occurred while subscribing. Please try again.', 'error');
+      if (
+        error instanceof Error &&
+        error.message === "Notification already exists"
+      ) {
+        onNotification(
+          `${email} is already subscribed to updates for ${domainName}`,
+          "error"
+        );
+      } else {
+        onNotification(
+          "An error occurred while subscribing. Please try again.",
+          "error"
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -39,8 +49,12 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center">
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">Get Domain Updates</h3>
-        <p className="text-gray-600 mb-6">Stay informed about changes to {domainName}</p>
+        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+          Get Domain Updates
+        </h3>
+        <p className="text-gray-600 mb-6">
+          Stay informed about changes to {domainName}
+        </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex items-center border-b border-gray-300 py-2">
             <input
@@ -67,7 +81,7 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md disabled:opacity-50"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Subscribing...' : 'Subscribe'}
+              {isSubmitting ? "Subscribing..." : "Subscribe"}
             </button>
           </div>
         </form>

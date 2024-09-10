@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Logo from './ui/Logo'
-import NavLink from './ui/NavLink'
-import SearchBar from './ui/SearchBar'
+import { useState } from "react";
+import Logo from "./ui/Logo";
+import NavLink from "./ui/NavLink";
+import SearchBar from "./ui/SearchBar";
 
 export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="bg-surface shadow-sm">
@@ -17,10 +17,9 @@ export default function Header() {
         </div>
         <nav className="hidden md:flex space-x-4">
           <NavLink href="/">Home</NavLink>
-          <NavLink href="/about">About</NavLink>
-          <NavLink href="/contact">Contact</NavLink>
+          <NavLink href="/notifications">Notifications</NavLink>
         </nav>
-        <button 
+        <button
           className="md:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
@@ -32,11 +31,10 @@ export default function Header() {
           <SearchBar />
           <nav className="flex flex-col space-y-2 mt-4">
             <NavLink href="/">Home</NavLink>
-            <NavLink href="/about">About</NavLink>
-            <NavLink href="/contact">Contact</NavLink>
+            <NavLink href="/notifications">Notifications</NavLink>
           </nav>
         </div>
       )}
     </header>
-  )
+  );
 }

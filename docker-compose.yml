@@ -1,5 +1,4 @@
 services:
-
   domain-service:
     container_name: domain-service
     build:
@@ -120,6 +119,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
   postgres_data:
+  rabbitmq_data:
