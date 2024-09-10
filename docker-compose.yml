@@ -59,20 +59,40 @@ services:
       rabbitmq:
         condition: service_healthy
 
-  frontend:
-    container_name: frontend
+  notification-service:
+    container_name: notification-service
     build:
-      context: ./frontend
-      dockerfile: frontend.dockerfile
+      context: ./backend/notification-service
+      dockerfile: notification-service.dockerfile
     ports:
-      - "3010:3010"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
+      - "5003:5003"
     environment:
-      - NODE_ENV=development
-    command: npm run dev
+      - DATABASE_URL=postgresql://user:password@db/notification_service
+      - SECRET_KEY=your_secret_key_here
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - DEBUG=True
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # frontend:
+  #   container_name: frontend
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: frontend.dockerfile
+  #   ports:
+  #     - "3010:3010"
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   environment:
+  #     - NODE_ENV=development
+  #   command: npm run dev
 
   db:
     container_name: dm-db
