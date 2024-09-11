@@ -13,12 +13,10 @@ A comprehensive service for tracking and managing DNS records and WHOIS informat
 - [Configuration](#configuration)
 - [API Documentation](#api-documentation)
 - [FrontEnd](#frontend)
-- [Access Database](#access-database)
-- [Planned Features](#planned-features)
 
 ## Overview
 
-Domain Monitor offers an easy-to-use platform for managing domain entries, monitoring DNS records and WHOIS information, and accessing historical changes. It's designed for system administrators, network engineers, and anyone needing to keep track of domain-related changes across multiple domains.
+Domain Monitor offers an easy-to-use platform for managing domain entries, monitoring DNS records and WHOIS information, and accessing historical changes. In addition you are able to receive alerts via our notification service. It's designed for system administrators, network engineers, and anyone needing to keep track of domain-related changes across multiple domains.
 
 ## Features
 
@@ -29,7 +27,7 @@ Domain Monitor offers an easy-to-use platform for managing domain entries, monit
 - RESTful API for easy integration
 - Pagination support for efficient data retrieval
 - Domain statistics and change tracking
-- Notification system for domain changes (frontend feature)
+- Notification system for domain changes (ability to subscribe / unsubscribe)
 
 ## Architecture
 
@@ -37,17 +35,19 @@ The system is built using a microservices architecture:
 
 <img src="./assets/architecture.JPG" alt="Architecture Diagram" height="400">
 
-1. Domain Service: Manages domain entries, validates domains, and initiates monitoring
-2. DNS Service: Tracks and provides current and historical DNS records
-3. WHOIS Service: Tracks and provides current and historical WHOIS information
-4. Frontend Service: Provides user interface for interacting with the system
-5. PostgreSQL Database: Stores domain, DNS record, and WHOIS data
-6. RabbitMQ: Handles inter-service communication
+1. API Gateway: Entry point for other microservices, protected with rate limiting
+2. Domain Service: Manages domain entries, validates domains, and initiates monitoring
+3. DNS Service: Tracks and provides current and historical DNS records
+4. WHOIS Service: Tracks and provides current and historical WHOIS information
+5. Frontend Service: Provides user interface for interacting with the system
+6. PostgreSQL Database: Stores domain, DNS record, and WHOIS data
+7. RabbitMQ: Handles inter-service communication using queues (fanout and direct exchanges)
 
 ### Technologies Used
 
 - Python 3.9+
 - Flask: Web framework for building the APIs
+- Redis: for caching
 - SQLAlchemy: ORM for database interactions
 - PostgreSQL: Database for storing domain, DNS, and WHOIS data
 - RabbitMQ: Message queue for inter-service communication
@@ -59,11 +59,9 @@ The system is built using a microservices architecture:
 
 ### Prerequisites
 
-- Docker and Docker Compose
+- Docker Deskstop
 - Python 3.9+
-- PostgreSQL
-- RabbitMQ
-- Node.js (for frontend development)
+- Node.js
 
 ### Installation
 
@@ -76,10 +74,7 @@ The system is built using a microservices architecture:
 3. Build and start the services:
    docker-compose up --build
 
-4. For frontend development:
-   cd frontend
-   npm install
-   npm run dev
+4. Navigate to http://localhost:3010
 
 ## Configuration
 
@@ -97,6 +92,7 @@ For detailed API documentation, please refer to the following README files:
 - [Domain Service README](./backend/domain-service/README.md)
 - [DNS Service README](./backend/dns-service/README.md)
 - [WHOIS Service README](./backend/whois-service/README.md)
+- [Notification Service README](./backend/notification-service/README.md)
 
 ## Frontend
 
@@ -108,13 +104,3 @@ The frontend provides a user-friendly interface for interacting with the Domain 
 - Notification subscription for domain changes
 
 For more details, see the [Frontend README](./frontend/README.md).
-
-## Planned Features
-- SSL Monitoring
-- Enhanced Alert System
-  - Email, SMS, webhooks
-- Caching (Redis) for improved performance
-- Rate limiting for API protection
-- Export of Historical Data
-- Advanced analytics and reporting
-- User authentication and personalized watchlists
