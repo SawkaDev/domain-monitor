@@ -1,7 +1,7 @@
 import { Notification } from "@/types/notification";
 import axios from "axios";
 
-const API_URL = "http://localhost:5003/api/v1";
+const API_URL = "http://localhost:8080/notification-service/api/v1";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -11,7 +11,7 @@ const api = axios.create({
 const getAllNotifications = async (): Promise<Notification[]> => {
   try {
     const response = await api.get<{ notifications: Notification[] }>(
-      "/notifications"
+      "/all"
     );
     return response.data.notifications;
   } catch (error) {
@@ -23,7 +23,7 @@ const getAllNotifications = async (): Promise<Notification[]> => {
 const getUserNotifications = async (email: string): Promise<Notification[]> => {
   try {
     const response = await api.get<{ notifications: Notification[] }>(
-      `/notifications/user/${email}`
+      `/all/user/${email}`
     );
     return response.data.notifications;
   } catch (error) {
@@ -37,7 +37,7 @@ const addNotification = async (
   email: string
 ): Promise<Notification> => {
   try {
-    const response = await api.post<Notification>("/notification", {
+    const response = await api.post<Notification>("/", {
       domain_name,
       email,
     });
@@ -56,7 +56,7 @@ const removeNotification = async (
   email: string
 ): Promise<void> => {
   try {
-    await api.delete("/notification", { data: { domain_name, email } });
+    await api.delete("/", { data: { domain_name, email } });
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       throw new Error("Notification not found");

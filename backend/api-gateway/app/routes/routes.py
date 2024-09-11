@@ -18,13 +18,13 @@ def dynamic_limit(f):
         service = kwargs.get('service')
 
         if service == 'high_priority':
-            limit = "100 per minute"
+            limit = "1000 per minute"
         elif service == 'low_priority':
-            limit = "50 per minute"
+            limit = "500 per minute"
         else:
-            limit = "100 per minute"
+            limit = "1000 per minute"
         
-        combined_limit = f"1000 per hour;{limit};100 per second"
+        combined_limit = f"1000 per hour;{limit};1000 per second"
         return limiter.limit(combined_limit)(f)(*args, **kwargs)
     return decorated_function
 

@@ -3,7 +3,7 @@ from app.api.v1 import bp
 from app.services.notification_service import NotificationService
 from sqlalchemy.exc import IntegrityError
 
-@bp.route('/notifications', methods=['GET'])
+@bp.route('/all', methods=['GET'])
 def get_all_notifications():
     try:
         notifications = NotificationService.get_all_notifications()
@@ -14,7 +14,7 @@ def get_all_notifications():
         current_app.logger.error(f"Error retrieving notifications: {str(e)}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
 
-@bp.route('/notifications/user/<string:email>', methods=['GET'])
+@bp.route('/all/user/<string:email>', methods=['GET'])
 def get_user_notifications(email):
     try:
         notifications = NotificationService.get_notifications_for_user(email)
@@ -26,7 +26,7 @@ def get_user_notifications(email):
         return jsonify({'error': 'An unexpected error occurred'}), 500
         
 
-@bp.route('/notification', methods=['POST'])
+@bp.route('/', methods=['POST'])
 def add_notification():
     data = request.json
     if not data or 'domain_name' not in data or 'email' not in data:
@@ -45,7 +45,7 @@ def add_notification():
         current_app.logger.error(f"Error adding notification: {str(e)}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
 
-@bp.route('/notification', methods=['DELETE'])
+@bp.route('/', methods=['DELETE'])
 def remove_notification():
     data = request.json
     if not data or 'domain_name' not in data or 'email' not in data:
