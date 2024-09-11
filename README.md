@@ -22,7 +22,7 @@ Domain Monitor offers an easy-to-use platform for managing domain entries, monit
 
 - Add, validate, and manage domains for monitoring
 - Retrieve current DNS records and WHOIS information for monitored domains
-- Access historical DNS and WHOIS changes
+- Access historical DNS and WHOIS changes (we check for updates every 30 minutes!)
 - Real-time updates via message queue system
 - RESTful API with versioning
 - Pagination support for efficient data retrieval
@@ -69,13 +69,12 @@ The system is built using a microservices architecture:
 ### Installation
 
 1. Clone the repository:
-   git clone https://github.com/yourusername/domain-monitor.git
 
 2. Navigate to the project directory:
    cd domain-monitor
 
-3. Build and start the services:
-   docker-compose up --build
+3. Build and start the services (due to RabbitMQ initialization, bootup may take up to 30 seconds):
+   docker compose up --build
 
 4. Navigate to http://localhost:3010
 
