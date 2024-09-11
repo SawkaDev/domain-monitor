@@ -1,4 +1,7 @@
 services = {
+    "domain-service": {
+        "url": "http://domain-service:5000",
+    },
     "dns-service": {
         "url": "http://dns-service:5001",
     },

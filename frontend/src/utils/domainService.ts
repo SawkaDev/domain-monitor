@@ -1,7 +1,7 @@
 import { DomainStats, DomainValidity } from "@/types/domain";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/v1";
+const API_URL = "http://localhost:8080/domain-service/api/v1";
 interface Domain {
   id: number;
   name: string;

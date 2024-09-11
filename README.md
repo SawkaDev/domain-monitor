@@ -44,6 +44,7 @@ The system is built using a microservices architecture:
 7. PostgreSQL Database: Stores domain, DNS record, and WHOIS data
 8. RabbitMQ Message Broker: Handles inter-service communication using queues (fanout and direct exchanges)
 9. Redis: For cachins and utilized by Rate Limiter in the API Gateway
+10. REST API's: Each service has a set of API's exposed to the Gateway. Version control for API's is in place to ensure future backwards compatability
 
 ### Technologies Used
 
