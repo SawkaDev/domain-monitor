@@ -2,7 +2,7 @@ from flask import jsonify, request
 from app.api.v1 import bp
 from app.services.dns_service import DNSService
 
-@bp.route('/dns/<string:domain>', methods=['GET'])
+@bp.route('/<string:domain>', methods=['GET'])
 def get_dns_records(domain):
     records = DNSService.get_current_dns_records(domain)
     if records:
@@ -10,7 +10,7 @@ def get_dns_records(domain):
     else:
         return jsonify([]), 200
 
-@bp.route('/dns/history/<string:domain>', methods=['GET'])
+@bp.route('/history/<string:domain>', methods=['GET'])
 def get_dns_history(domain):
     history = DNSService.get_dns_history(domain)
     if history:
@@ -20,16 +20,16 @@ def get_dns_history(domain):
 
 
 # TODO: helper route for now instead of using the scheduler
-@bp.route('/dns/<domain_name>', methods=['POST'])
+@bp.route('/<domain_name>', methods=['POST'])
 def update_dns_records(domain_name):
     history = DNSService.update_dns_records(domain_name)
     return jsonify({"status": history}), history and 200 or 500
 
-@bp.route('/dns/heartbeat', methods=['GET'])
+@bp.route('/heartbeat', methods=['GET'])
 def heartbeat():
     return jsonify({'status': 'ok'}), 200
 
-@bp.route('/dns/changes/<string:domain>', methods=['GET'])
+@bp.route('/changes/<string:domain>', methods=['GET'])
 def get_dns_changes(domain):
     changes = DNSService.get_dns_changes(domain)
     if changes:

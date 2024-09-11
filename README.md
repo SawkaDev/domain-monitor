@@ -39,9 +39,11 @@ The system is built using a microservices architecture:
 2. Domain Service: Manages domain entries, validates domains, and initiates monitoring
 3. DNS Service: Tracks and provides current and historical DNS records
 4. WHOIS Service: Tracks and provides current and historical WHOIS information
-5. Frontend Service: Provides user interface for interacting with the system
-6. PostgreSQL Database: Stores domain, DNS record, and WHOIS data
-7. RabbitMQ: Handles inter-service communication using queues (fanout and direct exchanges)
+5. Notification Service: Ability to subscribe to notificaitons for specific domains
+6. Frontend Service: Provides user interface for interacting with the system
+7. PostgreSQL Database: Stores domain, DNS record, and WHOIS data
+8. RabbitMQ Message Broker: Handles inter-service communication using queues (fanout and direct exchanges)
+9. Redis: For cachins and utilized by Rate Limiter in the API Gateway
 
 ### Technologies Used
 

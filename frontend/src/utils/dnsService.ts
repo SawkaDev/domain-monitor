@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DNSRecord } from '@/types/domain';
 
-const DNS_API_URL = 'http://localhost:5001/api/v1';
+const DNS_API_URL = 'http://localhost:8080/dns-service/api/v1';
 
 const api = axios.create({
   baseURL: DNS_API_URL,
@@ -10,7 +10,7 @@ const api = axios.create({
 
 const fetchCurrentDNS = async (domain: string): Promise<DNSRecord[]> => {
   try {
-    const response = await api.get<DNSRecord[]>(`/dns/${domain}`);
+    const response = await api.get<DNSRecord[]>(`/${domain}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching current DNS for domain ${domain}:`, error);
@@ -20,7 +20,7 @@ const fetchCurrentDNS = async (domain: string): Promise<DNSRecord[]> => {
 
 const getDNSHistory = async (domain: string) => {
   try {
-    const response = await api.get(`/dns/history/${domain}`);
+    const response = await api.get(`/history/${domain}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching DNS history for domain ${domain}:`, error);

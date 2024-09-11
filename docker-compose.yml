@@ -14,7 +14,7 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=yourredispassword
     volumes:
-      - ./backend/api-gateway:/app  # Mount local backend directory to the container for hot reload
+      - ./backend/api-gateway:/app
     depends_on:
       - redis
 
@@ -28,84 +28,84 @@ services:
     volumes:
       - redis_data:/data
 
-  # domain-service:
-  #   container_name: domain-service
-  #   build:
-  #     context: ./backend/domain-service
-  #     dockerfile: domain-service.dockerfile
-  #   ports:
-  #     - "5000:5000"
-  #   environment:
-  #     - DATABASE_URL=postgresql://user:password@db/domain_service
-  #     - SECRET_KEY=your_secret_key_here
-  #     - FLASK_ENV=development
-  #     - DEBUG=True
-  #     - RABBITMQ_HOST=rabbitmq
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #     rabbitmq:
-  #       condition: service_healthy
+  domain-service:
+    container_name: domain-service
+    build:
+      context: ./backend/domain-service
+      dockerfile: domain-service.dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db/domain_service
+      - SECRET_KEY=your_secret_key_here
+      - FLASK_ENV=development
+      - DEBUG=True
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
-  # dns-service:
-  #   container_name: dns-service
-  #   build:
-  #     context: ./backend/dns-service
-  #     dockerfile: dns-service.dockerfile
-  #   ports:
-  #     - "5001:5001"
-  #   environment:
-  #     - DATABASE_URL=postgresql://user:password@db/dns_service
-  #     - SECRET_KEY=your_secret_key_here
-  #     - FLASK_ENV=development
-  #     - FLASK_DEBUG=1
-  #     - DEBUG=True
-  #     - RABBITMQ_HOST=rabbitmq
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #     rabbitmq:
-  #       condition: service_healthy
+  dns-service:
+    container_name: dns-service
+    build:
+      context: ./backend/dns-service
+      dockerfile: dns-service.dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db/dns_service
+      - SECRET_KEY=your_secret_key_here
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - DEBUG=True
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
-  # whois-service:
-  #   container_name: whois-service
-  #   build:
-  #     context: ./backend/whois-service
-  #     dockerfile: whois-service.dockerfile
-  #   ports:
-  #     - "5002:5002"
-  #   environment:
-  #     - DATABASE_URL=postgresql://user:password@db/whois_service
-  #     - SECRET_KEY=your_secret_key_here
-  #     - FLASK_ENV=development
-  #     - FLASK_DEBUG=1
-  #     - DEBUG=True
-  #     - RABBITMQ_HOST=rabbitmq
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #     rabbitmq:
-  #       condition: service_healthy
+  whois-service:
+    container_name: whois-service
+    build:
+      context: ./backend/whois-service
+      dockerfile: whois-service.dockerfile
+    ports:
+      - "5002:5002"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db/whois_service
+      - SECRET_KEY=your_secret_key_here
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - DEBUG=True
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
-  # notification-service:
-  #   container_name: notification-service
-  #   build:
-  #     context: ./backend/notification-service
-  #     dockerfile: notification-service.dockerfile
-  #   ports:
-  #     - "5003:5003"
-  #   environment:
-  #     - DATABASE_URL=postgresql://user:password@db/notification_service
-  #     - SECRET_KEY=your_secret_key_here
-  #     - FLASK_ENV=development
-  #     - FLASK_DEBUG=1
-  #     - DEBUG=True
-  #     - RABBITMQ_HOST=rabbitmq
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #     rabbitmq:
-  #       condition: service_healthy
+  notification-service:
+    container_name: notification-service
+    build:
+      context: ./backend/notification-service
+      dockerfile: notification-service.dockerfile
+    ports:
+      - "5003:5003"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db/notification_service
+      - SECRET_KEY=your_secret_key_here
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - DEBUG=True
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   # frontend:
   #   container_name: frontend
@@ -122,34 +122,34 @@ services:
   #     - NODE_ENV=development
   #   command: npm run dev
 
-  # db:
-  #   container_name: dm-db
-  #   image: postgres:13
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   environment:
-  #     - POSTGRES_DB=dns_service
-  #     - POSTGRES_USER=user
-  #     - POSTGRES_PASSWORD=password
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U user -d dns_service"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
+  db:
+    container_name: dm-db
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=dns_service
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d dns_service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # rabbitmq:
-  #   container_name: rabbitmq
-  #   image: rabbitmq:3-management
-  #   ports:
-  #     - "5672:5672"
-  #     - "15672:15672"
-  #   healthcheck:
-  #     test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #   volumes:
-  #     - rabbitmq_data:/var/lib/rabbitmq
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
   postgres_data:
