@@ -4,7 +4,7 @@ This API provides endpoints for managing and retrieving WHOIS records for monito
 
 ## Endpoints
 
-### GET /whois/{domain}
+### GET /{domain}
 Retrieve the current WHOIS record for a specific domain.
 
 **Parameters:**
@@ -14,7 +14,7 @@ Retrieve the current WHOIS record for a specific domain.
 - 200: Current WHOIS record
 - 200: Empty object if no record found
 
-### GET /whois/history/{domain}
+### GET /history/{domain}
 Retrieve WHOIS history for a specific domain.
 
 **Parameters:**
@@ -24,7 +24,7 @@ Retrieve WHOIS history for a specific domain.
 - 200: List of historical WHOIS records
 - 200: Empty list if no history found
 
-### POST /whois/{domain_name}
+### POST /{domain_name}
 Update WHOIS record for a specific domain. (Manual trigger, may be removed in the future)
 
 **Parameters:**
@@ -34,13 +34,13 @@ Update WHOIS record for a specific domain. (Manual trigger, may be removed in th
 - 200: Update successful
 - 500: Update failed
 
-### GET /whois/heartbeat
+### GET /heartbeat
 Check if the service is running.
 
 **Responses:**
 - 200: Service is running
 
-### POST /whois/create/{domain}
+### POST /create/{domain}
 Create an initial WHOIS record for a domain.
 
 **Parameters:**
@@ -52,7 +52,7 @@ Create an initial WHOIS record for a domain.
 - 400: Missing domain_id
 - 500: Creation failed
 
-### GET /whois/changes/{domain}
+### GET /changes/{domain}
 Retrieve WHOIS changes for a specific domain.
 
 **Parameters:**
@@ -66,12 +66,12 @@ Retrieve WHOIS changes for a specific domain.
 
 To use this API, send HTTP requests to the appropriate endpoints. For example:
 
-GET /whois/example.com
-GET /whois/history/example.com
-POST /whois/example.com
-GET /whois/heartbeat
-POST /whois/create/example.com
-GET /whois/changes/example.com
+GET /example.com
+GET /history/example.com
+POST /example.com
+GET /heartbeat
+POST /create/example.com
+GET /changes/example.com
 
 ## Error Handling
 

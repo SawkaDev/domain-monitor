@@ -54,8 +54,8 @@ class DomainService:
 
     @staticmethod
     def get_whois_changes(domain_name):
-        dns_service_url = 'http://whois-service:5002/api/v1'
-        url = f"{dns_service_url}/whois/changes/{domain_name}"
+        dns_service_url = 'http://whois-service:5002/whois-service/api/v1'
+        url = f"{dns_service_url}/changes/{domain_name}"
         
         try:
             response = requests.get(url, timeout=5)

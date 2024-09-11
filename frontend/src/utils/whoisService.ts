@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5002/api/v1";
+const API_URL = "http://localhost:5002/whois-service/api/v1";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -9,7 +9,7 @@ const api = axios.create({
 
 const fetchWhoIs = async (domain: string) => {
   try {
-    const response = await api.get(`/whois/${domain}`);
+    const response = await api.get(`/${domain}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching Whois:", error);
@@ -19,7 +19,7 @@ const fetchWhoIs = async (domain: string) => {
 
 const fetchWhoIsHistory = async (domain: string) => {
   try {
-    const response = await api.get(`/whois/history/${domain}`);
+    const response = await api.get(`/history/${domain}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching history:", error);

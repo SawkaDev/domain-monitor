@@ -24,7 +24,7 @@ def dynamic_limit(f):
         else:
             limit = "100 per minute"
         
-        combined_limit = f"1000 per hour;{limit};5 per second"
+        combined_limit = f"1000 per hour;{limit};100 per second"
         return limiter.limit(combined_limit)(f)(*args, **kwargs)
     return decorated_function
 

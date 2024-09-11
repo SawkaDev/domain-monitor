@@ -26,7 +26,7 @@ def create_app():
         db.create_all()
 
     from app.api.v1 import bp as api_v1_bp
-    app.register_blueprint(api_v1_bp, url_prefix='/api/v1')
+    app.register_blueprint(api_v1_bp, url_prefix='/whois-service/api/v1')
 
     from app.utils.error_handlers import register_error_handlers
     register_error_handlers(app)

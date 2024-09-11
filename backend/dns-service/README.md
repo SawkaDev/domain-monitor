@@ -4,7 +4,7 @@ This API provides endpoints for managing and retrieving DNS records for monitore
 
 ## Endpoints
 
-### GET /dns/{domain}
+### GET /{domain}
 Retrieve current DNS records for a specific domain.
 
 **Parameters:**
@@ -14,7 +14,7 @@ Retrieve current DNS records for a specific domain.
 - 200: List of current DNS records
 - 200: Empty list if no records found
 
-### GET /dns/history/{domain}
+### GET /history/{domain}
 Retrieve DNS history for a specific domain.
 
 **Parameters:**
@@ -24,7 +24,7 @@ Retrieve DNS history for a specific domain.
 - 200: List of historical DNS records
 - 200: Empty list if no history found
 
-### POST /dns/{domain_name}
+### POST /{domain_name}
 Update DNS records for a specific domain. (Helper route for manual updates)
 
 **Parameters:**
@@ -34,13 +34,13 @@ Update DNS records for a specific domain. (Helper route for manual updates)
 - 200: Update successful
 - 500: Update failed
 
-### GET /dns/heartbeat
+### GET /heartbeat
 Check if the service is running.
 
 **Responses:**
 - 200: Service is running
 
-### GET /dns/changes/{domain}
+### GET /changes/{domain}
 Retrieve DNS changes for a specific domain.
 
 **Parameters:**
@@ -54,11 +54,11 @@ Retrieve DNS changes for a specific domain.
 
 To use this API, send HTTP requests to the appropriate endpoints. For example:
 
-GET /dns/example.com
-GET /dns/history/example.com
-POST /dns/example.com
-GET /dns/heartbeat
-GET /dns/changes/example.com
+GET /example.com
+GET /history/example.com
+POST /example.com
+GET /heartbeat
+GET /changes/example.com
 
 ## Error Handling
 
