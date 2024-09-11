@@ -35,7 +35,7 @@ Domain Monitor offers an easy-to-use platform for managing domain entries, monit
 
 The system is built using a microservices architecture:
 
-<img src="./assets/architecture.jpg" alt="Image Description" height="400">
+<img src="./assets/architecture.JPG" alt="Architecture Diagram" height="400">
 
 1. Domain Service: Manages domain entries, validates domains, and initiates monitoring
 2. DNS Service: Tracks and provides current and historical DNS records
