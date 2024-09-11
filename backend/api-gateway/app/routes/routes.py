@@ -12,24 +12,8 @@ logger = logging.getLogger(__name__)
 
 api_bp = Blueprint('api', __name__)
 
-def dynamic_limit(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        service = kwargs.get('service')
-
-        if service == 'high_priority':
-            limit = "1000 per minute"
-        elif service == 'low_priority':
-            limit = "500 per minute"
-        else:
-            limit = "1000 per minute"
-        
-        combined_limit = f"1000 per hour;{limit};1000 per second"
-        return limiter.limit(combined_limit)(f)(*args, **kwargs)
-    return decorated_function
-
 @api_bp.route('/<service>/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
-@dynamic_limit
+@limiter.limit("1000 per minute")
 def gateway(service, path):
     request_id = str(uuid.uuid4())
     start_time = time.time()

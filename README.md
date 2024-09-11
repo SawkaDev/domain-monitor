@@ -24,7 +24,7 @@ Domain Monitor offers an easy-to-use platform for managing domain entries, monit
 - Retrieve current DNS records and WHOIS information for monitored domains
 - Access historical DNS and WHOIS changes
 - Real-time updates via message queue system
-- RESTful API for easy integration
+- RESTful API with versioning
 - Pagination support for efficient data retrieval
 - Domain statistics and change tracking
 - Notification system for domain changes (ability to subscribe / unsubscribe)
@@ -44,19 +44,19 @@ The system is built using a microservices architecture:
 7. PostgreSQL Database: Stores domain, DNS record, and WHOIS data
 8. RabbitMQ Message Broker: Handles inter-service communication using queues (fanout and direct exchanges)
 9. Redis: For cachins and utilized by Rate Limiter in the API Gateway
-10. REST API's: Each service has a set of API's exposed to the Gateway. Version control for API's is in place to ensure future backwards compatability
 
 ### Technologies Used
 
 - Python 3.9+
-- Flask: Web framework for building the APIs
-- Redis: for caching
+- Flask: Framework for building the APIs
+- Next.js: Frontend framework for the user interface
+- Redis: For caching
 - SQLAlchemy: ORM for database interactions
-- PostgreSQL: Database for storing domain, DNS, and WHOIS data
+- PostgreSQL: Database for storing domain, DNS, Notifcations, and WHOIS data
 - RabbitMQ: Message queue for inter-service communication
 - Docker & Docker Compose: Containerization and orchestration
-- Next.js: Frontend framework for the user interface
-- React Query: Data fetching and state management in the frontend
+- React Query: Data fetching, caching, and state management in the frontend
+- Tailwind CSS: Frontend Styling
 
 ## Getting Started
 
@@ -102,6 +102,7 @@ For detailed API documentation, please refer to the following README files:
 The frontend provides a user-friendly interface for interacting with the Domain Monitor Service. Key features include:
 
 - Domain search and validation
+- Homepage with recently updated domains, with pagination
 - Comprehensive domain profiles with DNS and WHOIS information
 - Historical data visualization
 - Notification subscription for domain changes

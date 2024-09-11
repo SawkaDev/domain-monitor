@@ -23,7 +23,13 @@ export default function Home() {
 
   useEffect(() => {
     if (data && data.domains) {
-      setAllDomains((prevDomains) => [...prevDomains, ...data.domains]);
+      setAllDomains((prevDomains) => {
+        const newDomains = data.domains.filter(
+          (domain) =>
+            !prevDomains.some((prevDomain) => prevDomain.id === domain.id)
+        );
+        return [...prevDomains, ...newDomains];
+      });
     }
   }, [data]);
 
@@ -85,7 +91,10 @@ export default function Home() {
             </div>
           ))
         ) : (
-          <div className="text-center text-gray-500">No domains found</div>
+          <div className="text-center text-gray-500">
+            No domains found. Search for a domain to add it to the monitoring
+            service.
+          </div>
         )}
       </section>
 

@@ -52,7 +52,13 @@ export const OverviewTabMain: React.FC<OverviewTabMainProps> = ({
           </p>
           <p>
             <span className="font-semibold">Name Servers: </span>
-            {whoIsInfo.nameservers ? whoIsInfo.nameservers : "n/a"}
+            {whoIsInfo.nameservers && whoIsInfo.nameservers.length > 0 ? (
+              <span className="break-all">
+                {whoIsInfo.nameservers}
+              </span>
+            ) : (
+              "n/a"
+            )}
           </p>
         </div>
       </div>
