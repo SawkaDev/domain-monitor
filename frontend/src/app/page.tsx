@@ -11,6 +11,7 @@ const DOMAINS_PER_PAGE = 5;
 export default function Home() {
   const [page, setPage] = useState(1);
   const [allDomains, setAllDomains] = useState<Domain[]>([]);
+  const [totalDomains, setTotalDomains] = useState(0);
 
   const { data, isLoading, error, isFetching } = useQuery<
     DomainResponse,
@@ -22,7 +23,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    if (data && data.domains) {
+    if (data) {
       setAllDomains((prevDomains) => {
         const newDomains = data.domains.filter(
           (domain) =>
@@ -30,6 +31,8 @@ export default function Home() {
         );
         return [...prevDomains, ...newDomains];
       });
+
+      setTotalDomains((prevTotal) => Math.max(prevTotal, data.total));
     }
   }, [data]);
 
@@ -59,7 +62,7 @@ export default function Home() {
         <p className="text-xl text-text-secondary max-w-2xl mx-auto">
           Currently monitoring DNS/WHOIS changes for{" "}
           <span className="inline-flex items-center justify-center bg-blue-100 text-blue-800 text-2xl font-bold rounded-md px-3 py-1 min-w-[3rem]">
-            {data?.total || 0}
+            {totalDomains}
           </span>{" "}
           domains.
         </p>
@@ -98,7 +101,7 @@ export default function Home() {
         )}
       </section>
 
-      {data && allDomains.length < data.total && (
+      {allDomains.length < totalDomains && (
         <section className="text-center">
           <button
             onClick={loadMore}

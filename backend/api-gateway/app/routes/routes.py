@@ -7,6 +7,7 @@ from app.utils.logging_utils import log_request_info, log_response_info
 from app.services.service_registry import services
 from app.utils.rate_limiting import limiter
 from functools import wraps 
+from urllib.parse import urlencode
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,10 @@ def gateway(service, path):
         return jsonify({'error': 'Service not found'}), 404
 
     url = f"{services[service]['url']}/{service}/{path}"
+
+    if request.query_string:
+        url += f"?{request.query_string.decode('utf-8')}"
+
     logger.warning(f"Request: {request_id} | Forwarding request to: {url}")
     try:
         response = requests.request(
