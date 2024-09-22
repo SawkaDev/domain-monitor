@@ -2,6 +2,13 @@
 
 A comprehensive service for tracking and managing DNS records and WHOIS information across multiple domains, providing real-time monitoring, historical data tracking, and domain validation.
 
+## Screenshots
+Here are some screenshots showcasing the features:
+
+![Home Page](./assets/homepage.png)
+![Domain Details Page](./assets/domain-details.png)
+![Notifications Page](./assets/notifications.png)
+
 ## Table of Contents
 - [Overview](#overview)
 - [Features](#features)
