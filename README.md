@@ -5,9 +5,9 @@ A comprehensive service for tracking and managing DNS records and WHOIS informat
 ## Screenshots
 Here are some screenshots showcasing the features:
 
-![Home Page](./assets/homepage.png)
-![Domain Details Page](./assets/domain-details.png)
-![Notifications Page](./assets/notifications.png)
+[Home Page](./assets/homepage.png)  
+[Domain Details Page](./assets/domain-details.png)  
+[Notifications Page](./assets/notifications.png)
 
 ## Table of Contents
 - [Overview](#overview)
